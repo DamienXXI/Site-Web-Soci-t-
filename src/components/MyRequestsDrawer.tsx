@@ -1,0 +1,243 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import React from 'react';
+import { QuoteRequest } from '../types';
+import { WASTE_ITEMS } from '../data';
+import {
+  X,
+  Clock,
+  CheckCircle,
+  Truck,
+  PhoneCall,
+  Calendar,
+  Sparkles,
+  RefreshCw,
+  MapPin,
+  Trash2
+} from 'lucide-react';
+
+interface MyRequestsDrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  quotes: QuoteRequest[];
+  onDeleteQuote: (id: string) => void;
+  onRefresh: () => void;
+}
+
+export default function MyRequestsDrawer({
+  isOpen,
+  onClose,
+  quotes,
+  onDeleteQuote,
+  onRefresh
+}: MyRequestsDrawerProps) {
+  if (!isOpen) return null;
+
+  // Render a progress stepper based on quote date
+  const getTrackingState = (createdAt: string) => {
+    const elapsedMinutes = Math.floor((Date.now() - new Date(createdAt).getTime()) / 60000);
+    
+    // Virtual SLA steps
+    if (elapsedMinutes < 2) {
+      return {
+        step: 1,
+        title: "Validation automatique en cours",
+        desc: "Mon système calcule le trajet du camion le plus proche.",
+        color: "text-amber-600 bg-amber-50 border-amber-200"
+      };
+    } else if (elapsedMinutes < 8) {
+      return {
+        step: 2,
+        title: "Attribution d'un planificateur local",
+        desc: "Un conseiller technique analyse l'accessibilité de votre logement.",
+        color: "text-emerald-700 bg-emerald-50 border-emerald-100"
+      };
+    } else {
+      return {
+        step: 3,
+        title: "Prise de contact imminente",
+        desc: "Votre interlocuteur dédié va vous appeler sous 5 à 10 minutes.",
+        color: "text-blue-700 bg-blue-50 border-blue-100"
+      };
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 overflow-hidden">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm transition-opacity"
+        onClick={onClose}
+      />
+
+      <div className="absolute inset-y-0 right-0 max-w-full flex pl-10 md:pl-16">
+        <div className="w-screen max-w-sm bg-white/90 backdrop-blur-2xl shadow-2xl flex flex-col h-full border-l border-white/60">
+          
+          {/* Header */}
+          <div className="px-6 py-5 bg-white/95 border-b border-slate-200/55 text-slate-900 flex items-center justify-between relative">
+            <div className="flex items-center gap-2">
+              <div className="p-2 bg-emerald-100/80 border border-emerald-250/40 rounded-xl text-emerald-850 font-extrabold text-xs select-none">
+                Express
+              </div>
+              <div>
+                <h4 className="font-extrabold text-slate-900 text-base font-display">Mes demandes</h4>
+                <p className="text-[10px] text-slate-500 font-bold">Rappel garanti 5j/7</p>
+              </div>
+            </div>
+            
+            <div className="flex items-center gap-1.5">
+              <button 
+                onClick={onRefresh}
+                className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-full transition text-slate-700 cursor-pointer"
+                title="Actualiser le statut"
+              >
+                <RefreshCw className="w-4 h-4" />
+              </button>
+              <button 
+                onClick={onClose}
+                className="p-1.5 bg-slate-100 hover:bg-slate-200 rounded-full transition text-slate-700 cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+
+          {/* Content Body */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+            {quotes.length === 0 ? (
+              <div className="text-center py-16 px-4 space-y-4">
+                <div className="w-16 h-16 bg-white/60 text-slate-400 border border-dashed border-slate-200/80 rounded-full flex items-center justify-center mx-auto">
+                  <Clock className="w-8 h-8" />
+                </div>
+                <div className="space-y-1">
+                  <h5 className="font-extrabold text-slate-700 text-sm">Aucune demande active</h5>
+                  <p className="text-xs text-slate-500 font-medium">
+                    Utilisez mon calculateur interactif pour faire votre première estimation en quelques clics.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-5 py-2.5 bg-emerald-600 text-white font-bold rounded-full text-xs hover:bg-emerald-700 transition cursor-pointer"
+                >
+                  Calculer mon volume
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="p-3 bg-emerald-50/60 backdrop-blur-sm text-emerald-900 rounded-2xl text-xs flex gap-2 leading-relaxed border border-emerald-100/50 font-semibold">
+                  <Sparkles className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600 animate-pulse" />
+                  <span>
+                    <strong>SLA Prioritaire :</strong> Mes équipes régionales étudient vos volumes en m³ en continu. Conservez cette page ouverte, les statuts s'actualisent.
+                  </span>
+                </div>
+
+                <div className="space-y-4">
+                  {quotes.map(quote => {
+                    const tracking = getTrackingState(quote.createdAt);
+                    const selectedItems = Object.entries(quote.selectedItems).filter(([_, qty]) => qty > 0);
+
+                    return (
+                      <div key={quote.id} className="border border-white/70 rounded-3xl bg-white/60 backdrop-blur-sm shadow-sm p-4 space-y-4">
+                        
+                        {/* Title bar */}
+                        <div className="flex items-center justify-between border-b border-slate-200/50 pb-2.5">
+                          <div>
+                            <span className="text-xs font-extrabold text-slate-500">Réf : {quote.id}</span>
+                            <div className="text-[10px] text-slate-400 font-semibold">Formulée le {new Date(quote.createdAt).toLocaleDateString('fr-FR')} à {new Date(quote.createdAt).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'})}</div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => onDeleteQuote(quote.id)}
+                            className="p-1 text-slate-400 hover:text-rose-600 rounded-full transition cursor-pointer"
+                            title="Annuler cette demande"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        {/* Tracker status banner */}
+                        <div className={`p-3 rounded-2xl border text-xs leading-relaxed font-semibold shadow-sm ${tracking.color}`}>
+                          <div className="font-extrabold flex items-center gap-1.5 mb-0.5">
+                            <span className="inline-block w-2.5 h-2.5 rounded-full bg-current animate-pulse shrink-0"></span>
+                            {tracking.title}
+                          </div>
+                          <p className="font-semibold opacity-90 text-[11px]">{tracking.desc}</p>
+                        </div>
+
+                        {/* Quote summary details */}
+                        <div className="grid grid-cols-2 gap-y-1.5 gap-x-2 text-xs text-slate-600 border-b border-dashed border-slate-200 pb-3 font-medium">
+                          <div className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5 text-slate-400" /> Ville :</div>
+                          <div className="font-bold text-slate-900 text-right">{quote.zipCode} {quote.city}</div>
+                          
+                          <div className="flex items-center gap-1"><Truck className="w-3.5 h-3.5 text-slate-400" /> Volume :</div>
+                          <div className="font-extrabold text-slate-900 text-right text-emerald-600">{quote.estimatedVolumeM3} m³</div>
+
+                          <div className="flex items-center gap-1"><Clock className="w-3.5 h-3.5 text-slate-400" /> Cadre :</div>
+                          <div className="font-bold text-slate-900 text-right uppercase text-[11px]">{quote.serviceType}</div>
+                        </div>
+
+                        {/* Selected items list inside this quote */}
+                        {selectedItems.length > 0 && (
+                          <div className="space-y-1">
+                            <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Inventaire ({selectedItems.length}) :</div>
+                            <div className="flex flex-wrap gap-1">
+                              {selectedItems.map(([itemId, qty]) => {
+                                const item = WASTE_ITEMS.find(i => i.id === itemId);
+                                if (!item) return null;
+                                return (
+                                  <span key={itemId} className="inline-flex items-center gap-1 text-[10px] bg-white/80 border border-slate-200/50 text-slate-750 px-2 py-0.5 rounded-full font-bold shadow-sm">
+                                    {item.name} <strong className="text-slate-900">x{qty}</strong>
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* Tracking workflow UI icons */}
+                        <div className="grid grid-cols-3 gap-1.5 pt-2 border-t border-slate-200/50 text-[10px] font-bold text-center mt-2">
+                          <div className="flex flex-col items-center gap-1 text-emerald-600">
+                            <CheckCircle className="w-4 h-4 stroke-[2.5]" />
+                            <span>1. Chiffré</span>
+                          </div>
+                          <div className={`flex flex-col items-center gap-1 ${tracking.step >= 2 ? 'text-emerald-500' : 'text-slate-300'}`}>
+                            <PhoneCall className="w-4 h-4 stroke-[2]" />
+                            <span>2. Entretien</span>
+                          </div>
+                          <div className={`flex flex-col items-center gap-1 ${tracking.step >= 3 ? 'text-emerald-500' : 'text-slate-300'}`}>
+                            <Calendar className="w-4 h-4 stroke-[2]" />
+                            <span>3. Planifié</span>
+                          </div>
+                        </div>
+
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Footer of Drawer */}
+          <div className="p-6 bg-white/45 backdrop-blur-sm border-t border-slate-200/50 space-y-3">
+            <div className="flex items-center justify-between text-xs text-slate-500 font-bold">
+              <span>Besoin d'aide immédiate ?</span>
+              <span className="font-extrabold text-slate-900">Lundi au Vendredi - 9h/18h</span>
+            </div>
+            <a
+              href="tel:0661292059"
+              className="w-full py-3 bg-slate-900 hover:bg-slate-950 text-white font-extrabold rounded-full text-center text-xs uppercase tracking-wider block shadow-md transition"
+            >
+              Appeler le 06 61 29 20 59
+            </a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  );
+}

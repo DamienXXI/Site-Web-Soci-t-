@@ -1,0 +1,6 @@
+{
+  "name": "Damien Pommier",
+  "description": "Damien Pommier - Service professionnel d'enlèvement d'encombrants et débarras d'urgence dans vos copropriétés.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
