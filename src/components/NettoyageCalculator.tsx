@@ -8,27 +8,23 @@ interface NettoyageCalculatorProps {
 export default function NettoyageCalculator({ onQuoteRequest }: NettoyageCalculatorProps) {
   const [nettoyageM2, setNettoyageM2] = useState<number>(60);
   const [nettoyageType, setNettoyageType] = useState<'appartement' | 'maison'>('appartement');
-  const [nettoyageSalete, setNettoyageSalete] = useState<'standard' | 'tres-sale' | 'diogene'>('standard');
-  const [netOptionVitres, setNetOptionVitres] = useState<boolean>(false);
+  const [nettoyageSalete, setNettoyageSalete] = useState<'propre' | 'standard' | 'tres-sale'>('standard');
   const [netOptionCave, setNetOptionCave] = useState<boolean>(false);
   const [netOptionDesinfection, setNetOptionDesinfection] = useState<boolean>(false);
 
   // Derived calculations
-  const nettoyagePricePerM2 = nettoyageType === 'appartement' ? 3.5 : 4.5;
-  const nettoyageMultiplier = 
-    nettoyageSalete === 'standard' ? 1.0 :
-    nettoyageSalete === 'tres-sale' ? 1.85 : 3.5;
+  const pricePerM2 = nettoyageType === 'appartement'
+    ? (nettoyageSalete === 'propre' ? 5 : nettoyageSalete === 'standard' ? 8 : 15)
+    : (nettoyageSalete === 'propre' ? 6 : nettoyageSalete === 'standard' ? 10 : 18);
   
-  let totalNettoyagePrice = Math.round(nettoyageM2 * nettoyagePricePerM2 * nettoyageMultiplier);
-  if (netOptionVitres) totalNettoyagePrice += 45;
-  if (netOptionCave) totalNettoyagePrice += 70;
+  let totalNettoyagePrice = Math.round(nettoyageM2 * pricePerM2);
+  if (netOptionCave) totalNettoyagePrice += 50;
   if (netOptionDesinfection) totalNettoyagePrice += 90;
   totalNettoyagePrice = Math.max(120, totalNettoyagePrice);
   
   const estimatedNettoyageHours = Math.ceil(
-    (nettoyageM2 * (nettoyageSalete === 'standard' ? 0.08 : nettoyageSalete === 'tres-sale' ? 0.16 : 0.32)) + 
+    (nettoyageM2 * (nettoyageSalete === 'propre' ? 0.05 : nettoyageSalete === 'standard' ? 0.08 : 0.16)) + 
     (nettoyageType === 'maison' ? 1.5 : 0.5) +
-    (netOptionVitres ? 1.0 : 0) +
     (netOptionCave ? 1.5 : 0) +
     (netOptionDesinfection ? 1.0 : 0)
   );
@@ -111,15 +107,32 @@ export default function NettoyageCalculator({ onQuoteRequest }: NettoyageCalcula
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <button
               type="button"
-              onClick={() => setNettoyageSalete('standard')}
+              onClick={() => setNettoyageSalete('propre')}
               className={`p-3 rounded-xl border text-left flex flex-col justify-between transition duration-200 cursor-pointer ${
-                nettoyageSalete === 'standard'
+                nettoyageSalete === 'propre'
                   ? 'bg-emerald-50/60 border-emerald-400 text-slate-900 shadow-sm'
                   : 'border-slate-150 text-slate-600 hover:bg-slate-50'
               }`}
             >
-              <span className="font-extrabold text-xs sm:text-sm text-emerald-800 block">✨ Standard</span>
-              <span className="text-[10px] text-slate-500 font-sans font-semibold mt-1">Légère poussière, fin de bail classique</span>
+              <span className="font-extrabold text-xs sm:text-sm text-emerald-800 block">✨ Logement propre</span>
+              <span className="text-[10px] text-slate-500 font-sans font-semibold mt-1">
+                Entretien régulier, mise au propre simple
+              </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setNettoyageSalete('standard')}
+              className={`p-3 rounded-xl border text-left flex flex-col justify-between transition duration-200 cursor-pointer ${
+                nettoyageSalete === 'standard'
+                  ? 'bg-amber-50/60 border-amber-400 text-slate-950 shadow-sm'
+                  : 'border-slate-150 text-slate-600 hover:bg-slate-50'
+              }`}
+            >
+              <span className="font-extrabold text-xs sm:text-sm text-amber-800 block">⚠️ Moyennement sale</span>
+              <span className="text-[10px] text-slate-500 font-sans font-semibold mt-1">
+                Fin de bail standard, emménagement
+              </span>
             </button>
 
             <button
@@ -127,25 +140,14 @@ export default function NettoyageCalculator({ onQuoteRequest }: NettoyageCalcula
               onClick={() => setNettoyageSalete('tres-sale')}
               className={`p-3 rounded-xl border text-left flex flex-col justify-between transition duration-200 cursor-pointer ${
                 nettoyageSalete === 'tres-sale'
-                  ? 'bg-amber-50/60 border-amber-400 text-slate-900 shadow-sm'
+                  ? 'bg-rose-50/60 border-rose-400 text-slate-950 shadow-sm'
                   : 'border-slate-150 text-slate-600 hover:bg-slate-50'
               }`}
             >
-              <span className="font-extrabold text-xs sm:text-sm text-amber-800 block">⚠️ Très sale</span>
-              <span className="text-[10px] text-slate-500 font-sans font-semibold mt-1">Crassé, tâches tenaces, fin de chantier</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => setNettoyageSalete('diogene')}
-              className={`p-3 rounded-xl border text-left flex flex-col justify-between transition duration-200 cursor-pointer ${
-                nettoyageSalete === 'diogene'
-                  ? 'bg-rose-50/60 border-rose-400 text-slate-900 shadow-sm'
-                  : 'border-slate-150 text-slate-600 hover:bg-slate-50'
-              }`}
-            >
-              <span className="font-extrabold text-xs sm:text-sm text-rose-800 block">☣️ Diogène</span>
-              <span className="text-[10px] text-slate-500 font-sans font-semibold mt-1">Insalubrité, accumulation Diogène extrême</span>
+              <span className="font-extrabold text-xs sm:text-sm text-rose-800 block">☣️ Très sale ou encrassé</span>
+              <span className="text-[10px] text-slate-500 font-sans font-semibold mt-1">
+                Logement très sale, encrassé, remises en état
+              </span>
             </button>
           </div>
         </div>
@@ -156,23 +158,7 @@ export default function NettoyageCalculator({ onQuoteRequest }: NettoyageCalcula
             Prestations Optionnelles complémentaires :
           </label>
           
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-            <button
-              type="button"
-              onClick={() => setNetOptionVitres(!netOptionVitres)}
-              className={`p-2.5 rounded-xl border text-left flex items-start gap-2.5 transition duration-200 cursor-pointer ${
-                netOptionVitres
-                  ? 'bg-emerald-50/40 border-emerald-400/80 shadow-xs'
-                  : 'border-slate-150 hover:bg-slate-50'
-              }`}
-            >
-              <span className="text-lg">🪟</span>
-              <div>
-                <span className="block text-xs font-extrabold text-slate-800">Vitres (+45€)</span>
-                <span className="text-[9px] text-slate-400 font-bold block">Toutes huisseries/glaces</span>
-              </div>
-            </button>
-
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <button
               type="button"
               onClick={() => setNetOptionCave(!netOptionCave)}
@@ -184,7 +170,7 @@ export default function NettoyageCalculator({ onQuoteRequest }: NettoyageCalcula
             >
               <span className="text-lg">📦</span>
               <div>
-                <span className="block text-xs font-extrabold text-slate-800">Cave (+70€)</span>
+                <span className="block text-xs font-extrabold text-slate-800">Cave (+50€)</span>
                 <span className="text-[9px] text-slate-400 font-bold block">Sols, plafonds, recoins</span>
               </div>
             </button>
@@ -246,7 +232,7 @@ export default function NettoyageCalculator({ onQuoteRequest }: NettoyageCalcula
             <div className="space-y-1">
               <span className="text-slate-400 block font-sans font-bold">🧠 Techniciens requis :</span>
               <span className="font-extrabold text-sm text-slate-100 font-mono">
-                {nettoyageM2 < 70 && nettoyageSalete === 'standard' ? '1 Opérateur' : nettoyageM2 > 150 || nettoyageSalete === 'diogene' ? '3 Opérateurs' : '2 Opérateurs'}
+                {nettoyageM2 < 70 && nettoyageSalete === 'propre' ? '1 Opérateur' : nettoyageM2 > 150 || nettoyageSalete === 'tres-sale' ? '3 Opérateurs' : '2 Opérateurs'}
               </span>
               <span className="text-[9px] text-slate-400 block font-sans font-semibold">Assureurs d'hygiène</span>
             </div>

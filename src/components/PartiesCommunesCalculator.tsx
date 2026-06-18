@@ -86,11 +86,11 @@ export default function PartiesCommunesCalculator({ onQuoteRequest }: PartiesCom
             onChange={(e) => setPartiesLots(parseInt(e.target.value))}
             className="w-full accent-emerald-600 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer"
           />
-          <div className="flex justify-between text-[10px] font-bold text-slate-400 font-sans">
-            <span>4 lots (Petit immeuble)</span>
-            <span>20 lots</span>
-            <span>50 lots</span>
-            <span>100 lots (Grand ensemble)</span>
+          <div className="relative w-full h-5 text-[10px] font-bold text-slate-400 font-sans">
+            <span className="absolute left-0">4 lots (Petit immeuble)</span>
+            <span className="absolute left-[16.67%] -translate-x-1/2 whitespace-nowrap">20 lots</span>
+            <span className="absolute left-[47.92%] -translate-x-1/2 whitespace-nowrap">50 lots</span>
+            <span className="absolute right-0">100 lots (Grand ensemble)</span>
           </div>
           {partiesLots >= 25 && (
             <p className="text-[10px] text-slate-700 bg-emerald-50 px-2 py-1 rounded font-medium">

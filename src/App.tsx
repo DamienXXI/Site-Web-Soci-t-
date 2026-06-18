@@ -321,15 +321,16 @@ export default function App() {
                     </button>
 
                     <button
-                      onClick={() => {
-                        setCurrentPage('autres-prestations');
-                      }}
-                      className="p-3 text-left hover:bg-emerald-50/65 rounded-xl transition flex gap-2.5 items-start cursor-pointer group/item border-t border-slate-100"
+                      disabled
+                      className="p-3 text-left rounded-xl transition flex gap-2.5 items-start cursor-not-allowed opacity-40 border-t border-slate-100 select-none"
                     >
-                      <span className="text-lg">🛠️</span>
+                      <span className="text-lg grayscale">🛠️</span>
                       <div>
-                        <div className="font-extrabold text-slate-950 group-hover/item:text-emerald-700 transition font-sans">Autres prestations de service</div>
-                        <div className="text-[10px] text-slate-400 font-semibold font-sans">Terrassement mini-pelle, carport métalliques</div>
+                        <div className="font-extrabold text-slate-400 font-sans flex items-center gap-1.5 flex-wrap">
+                          <span>Autres prestations de service</span>
+                          <span className="px-1.5 py-0.5 text-[8px] bg-slate-100 dark:bg-slate-800 text-slate-500 rounded font-bold uppercase tracking-wider">prochainement</span>
+                        </div>
+                        <div className="text-[10px] text-slate-450 font-semibold font-sans">Terrassement mini-pelle, carport métalliques</div>
                       </div>
                     </button>
                   </div>
@@ -438,15 +439,10 @@ export default function App() {
                   🚚 Service de déménagement
                 </button>
                 <button
-                  onClick={() => {
-                    setCurrentPage('autres-prestations');
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`w-full text-left py-2 px-3 rounded-lg block font-semibold ${
-                    currentPage === 'autres-prestations' ? 'text-emerald-700 bg-emerald-50/60 font-bold' : 'text-slate-600 hover:text-emerald-600'
-                  }`}
+                  disabled
+                  className="w-full text-left py-2 px-3 rounded-lg block font-semibold opacity-40 cursor-not-allowed select-none text-slate-450"
                 >
-                  🛠️ Autres prestations de service
+                  🛠️ Autres prestations de service <span className="ml-1 px-1.5 py-0.5 text-[8px] bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded font-black uppercase tracking-wider select-none">prochainement</span>
                 </button>
               </div>
             </div>
@@ -1441,20 +1437,18 @@ export default function App() {
 
               {/* Option 4: Autres prestations */}
               <button
-                onClick={() => {
-                  setActiveModal(null);
-                  setCurrentPage('autres-prestations');
-                }}
-                className="w-full p-4 text-left border border-slate-200/80 hover:border-emerald-300 bg-slate-50/50 hover:bg-emerald-50/30 rounded-2xl transition-all duration-200 flex items-start gap-4 cursor-pointer group/choice"
+                disabled
+                className="w-full p-4 text-left border border-slate-150 bg-slate-50/40 rounded-2xl flex items-start gap-4 cursor-not-allowed opacity-50 select-none"
               >
-                <div className="p-3 bg-emerald-100/60 text-emerald-800 rounded-xl group-hover/choice:bg-emerald-600 group-hover/choice:text-white transition-all duration-200 text-xl shrink-0">
+                <div className="p-3 bg-slate-100 text-slate-400 rounded-xl text-xl shrink-0 grayscale">
                   🛠️
                 </div>
                 <div>
-                  <h5 className="font-display font-black text-slate-900 group-hover/choice:text-emerald-700 transition text-sm md:text-base">
-                    Autres prestations de service
+                  <h5 className="font-display font-black text-slate-450 text-sm md:text-base flex items-center gap-1.5 flex-wrap">
+                    <span>Autres prestations de service</span>
+                    <span className="px-1.5 py-0.5 text-[9px] bg-slate-200 text-slate-600 rounded font-bold uppercase tracking-wider">prochainement</span>
                   </h5>
-                  <p className="text-[11px] md:text-xs text-slate-500 mt-1 leading-relaxed font-sans font-medium">
+                  <p className="text-[11px] md:text-xs text-slate-450 mt-1 leading-relaxed font-sans font-medium">
                     Terrassement de terrain avec mini-pelle, montage de carport métallique, manutention et transport d'objets lourds.
                   </p>
                 </div>
