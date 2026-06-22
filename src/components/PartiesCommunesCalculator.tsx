@@ -6,10 +6,10 @@ interface PartiesCommunesCalculatorProps {
 }
 
 export default function PartiesCommunesCalculator({ onQuoteRequest }: PartiesCommunesCalculatorProps) {
-  const [partiesLots, setPartiesLots] = useState<number>(12);
+  const [partiesLots, setPartiesLots] = useState<number>(0);
   const [partiesFrequence, setPartiesFrequence] = useState<'hebdomadaire' | 'bi-hebdomadaire' | 'quinzomadaire' | 'mensuel'>('hebdomadaire');
   const [partiesComplexite, setPartiesComplexite] = useState<'simple' | 'standard' | 'complexe'>('standard');
-  const [partiesOptionBacs, setPartiesOptionBacs] = useState<boolean>(true);
+  const [partiesOptionBacs, setPartiesOptionBacs] = useState<boolean>(false);
   const [partiesOptionVitres, setPartiesOptionVitres] = useState<boolean>(false);
   const [partiesOptionNettoyage, setPartiesOptionNettoyage] = useState<boolean>(false);
 
@@ -35,25 +35,27 @@ export default function PartiesCommunesCalculator({ onQuoteRequest }: PartiesCom
     partiesComplexite === 'simple' ? 0.85 :
     partiesComplexite === 'standard' ? 1.0 : 1.30;
 
-  let totalPartiesPrice = Math.round(partiesLots * partiesBaseCostPerLot * partiesSizeFactor * partiesFreqMultiplier * partiesComplexMultiplier);
+  let totalPartiesPrice = partiesLots > 0 ? Math.round(partiesLots * partiesBaseCostPerLot * partiesSizeFactor * partiesFreqMultiplier * partiesComplexMultiplier) : 0;
   
-  // Option Bacs management: 3.5€ per lot
-  if (partiesOptionBacs) {
-    const bacsPrice = Math.min(150, Math.max(25, partiesLots * 3.5));
-    totalPartiesPrice += Math.round(bacsPrice);
-  }
-  
-  // Option Vitres Flat fee: +45€ flat / month
-  if (partiesOptionVitres) {
-    totalPartiesPrice += 45;
-  }
+  if (partiesLots > 0) {
+    // Option Bacs management: 3.5€ per lot
+    if (partiesOptionBacs) {
+      const bacsPrice = Math.min(150, Math.max(25, partiesLots * 3.5));
+      totalPartiesPrice += Math.round(bacsPrice);
+    }
+    
+    // Option Vitres Flat fee: +45€ flat / month
+    if (partiesOptionVitres) {
+      totalPartiesPrice += 45;
+    }
 
-  // Option Nettoyage flat fee: +120€ / month
-  if (partiesOptionNettoyage) {
-    totalPartiesPrice += 120;
-  }
+    // Option Nettoyage flat fee: +120€ / month
+    if (partiesOptionNettoyage) {
+      totalPartiesPrice += 120;
+    }
 
-  totalPartiesPrice = Math.max(85, totalPartiesPrice); // minimum intervention billing
+    totalPartiesPrice = Math.max(85, totalPartiesPrice); // minimum intervention billing
+  }
 
   return (
     <div id="simulateur-parties-communes-inner" className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start text-left">
@@ -68,10 +70,10 @@ export default function PartiesCommunesCalculator({ onQuoteRequest }: PartiesCom
             <div className="flex items-center gap-1.5 bg-slate-100 border border-slate-200 px-3 py-1 rounded-lg">
               <input
                 type="number"
-                min="4"
+                min="0"
                 max="200"
                 value={partiesLots}
-                onChange={(e) => setPartiesLots(Math.max(4, parseInt(e.target.value) || 4))}
+                onChange={(e) => setPartiesLots(Math.max(0, parseInt(e.target.value) || 0))}
                 className="w-12 text-right font-black text-slate-900 bg-transparent outline-none text-xs sm:text-sm font-sans"
               />
               <span className="text-xs font-bold text-slate-500">lots</span>
@@ -79,16 +81,16 @@ export default function PartiesCommunesCalculator({ onQuoteRequest }: PartiesCom
           </div>
           <input
             type="range"
-            min="4"
+            min="0"
             max="100"
             step="1"
             value={partiesLots}
-            onChange={(e) => setPartiesLots(parseInt(e.target.value))}
+            onChange={(e) => setPartiesLots(parseInt(e.target.value) || 0)}
             className="w-full accent-emerald-600 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer"
           />
           <div className="relative w-full h-5 text-[10px] font-bold text-slate-400 font-sans">
-            <span className="absolute left-0">4 lots (Petit immeuble)</span>
-            <span className="absolute left-[16.67%] -translate-x-1/2 whitespace-nowrap">20 lots</span>
+            <span className="absolute left-0">0 lot</span>
+            <span className="absolute left-[20%] -translate-x-1/2 whitespace-nowrap">20 lots</span>
             <span className="absolute left-[47.92%] -translate-x-1/2 whitespace-nowrap">50 lots</span>
             <span className="absolute right-0">100 lots (Grand ensemble)</span>
           </div>

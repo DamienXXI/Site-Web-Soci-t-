@@ -56,7 +56,7 @@ export default function AutresPrestations({ onQuoteSubmitted }: AutresPrestation
   const [parking, setParking] = useState<'proche' | 'moyen' | 'eloigne'>('proche');
   
   // Specific Simulator States
-  const [terrassementSurface, setTerrassementSurface] = useState(20); // m²
+  const [terrassementSurface, setTerrassementSurface] = useState(0); // m²
   const [terrassementTypeSol, setTerrassementTypeSol] = useState<'meuble' | 'compact' | 'rocheux'>('meuble');
   const [terrassementProfondeur, setTerrassementProfondeur] = useState(0.3); // m depth
   const [carportType, setCarportType] = useState<'simple' | 'double' | 'triple'>('simple');
@@ -88,8 +88,8 @@ export default function AutresPrestations({ onQuoteSubmitted }: AutresPrestation
       const depthRatio = terrassementProfondeur / 0.3;
       const basePricePerM2 = 18;
       
-      ourPrice = baseFee + (terrassementSurface * (basePricePerM2 + solFee) * depthRatio);
-      competitorPrice = 650 + (terrassementSurface * (38 + solFee * 1.5) * depthRatio);
+      ourPrice = terrassementSurface > 0 ? (baseFee + (terrassementSurface * (basePricePerM2 + solFee) * depthRatio)) : 0;
+      competitorPrice = terrassementSurface > 0 ? (650 + (terrassementSurface * (38 + solFee * 1.5) * depthRatio)) : 0;
       
       explanationBreakdown = `Nivellement / Décaissement sur ${terrassementSurface} m² (profondeur ${Math.round(terrassementProfondeur * 100)} cm). Sol : ${solLabel}.`;
       ourEdge = "";
@@ -159,8 +159,24 @@ export default function AutresPrestations({ onQuoteSubmitted }: AutresPrestation
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    const emailClean = email.trim();
+    const phoneClean = phone.replace(/[\s\(\)\.-]/g, '');
+    const emailIsValid = !emailClean || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailClean);
+    const phoneIsValid = !phoneClean || /^(?:0|\+33|0033)[1-9]\d{8}$/.test(phoneClean);
+
     if (!fullName || !email || !phone || !city) {
       alert('Veuillez renseigner les champs obligatoires.');
+      return;
+    }
+
+    if (!emailIsValid) {
+      alert("Veuillez saisir une adresse e-mail valide (ex: jean@email.com).");
+      return;
+    }
+
+    if (!phoneIsValid) {
+      alert("Veuillez saisir un numéro de téléphone valide (ex: 06 12 34 56 78).");
       return;
     }
 
@@ -314,7 +330,7 @@ export default function AutresPrestations({ onQuoteSubmitted }: AutresPrestation
                   </div>
                   <input
                     type="range"
-                    min="5"
+                    min="0"
                     max="150"
                     step="5"
                     value={terrassementSurface}
@@ -551,8 +567,17 @@ export default function AutresPrestations({ onQuoteSubmitted }: AutresPrestation
                     placeholder="0612345678"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-800 outline-none focus:bg-white focus:border-emerald-500"
+                    className={`w-full text-xs border rounded-xl px-3.5 py-2.5 font-semibold outline-none transition ${
+                      phone && !/^(?:0|\+33|0033)[1-9]\d{8}$/.test(phone.replace(/[\s\(\)\.-]/g, ''))
+                        ? 'border-red-500 bg-red-50/10 text-red-900 focus:bg-white focus:border-red-500'
+                        : 'bg-slate-50 border-slate-200 text-slate-800 focus:bg-white focus:border-emerald-500'
+                    }`}
                   />
+                  {phone && !/^(?:0|\+33|0033)[1-9]\d{8}$/.test(phone.replace(/[\s\(\)\.-]/g, '')) && (
+                    <p className="text-[10px] text-red-500 font-bold mt-1 font-sans">
+                      Numéro de téléphone invalide (ex: 0612345678)
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-1.5">
@@ -595,8 +620,17 @@ export default function AutresPrestations({ onQuoteSubmitted }: AutresPrestation
                   placeholder="jean.dupont@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full text-xs bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 font-semibold text-slate-800 outline-none focus:bg-white focus:border-emerald-500"
+                  className={`w-full text-xs border rounded-xl px-3.5 py-2.5 font-semibold outline-none transition ${
+                    email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+                      ? 'border-red-500 bg-red-50/10 text-red-900 focus:bg-white focus:border-red-500'
+                      : 'bg-slate-50 border-slate-200 text-slate-800 focus:bg-white focus:border-emerald-500'
+                  }`}
                 />
+                {email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) && (
+                  <p className="text-[10px] text-red-500 font-bold mt-1 font-sans">
+                    Format e-mail invalide (ex: jean.dupont@email.com)
+                  </p>
+                )}
               </div>
             </div>
 

@@ -162,8 +162,24 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
       alert("Veuillez sélectionner au moins un encombrant à évacuer pour générer un devis.");
       return;
     }
+
+    const emailClean = email.trim();
+    const phoneClean = phone.replace(/[\s\(\)\.-]/g, '');
+    const emailIsValid = !emailClean || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailClean);
+    const phoneIsValid = !phoneClean || /^(?:0|\+33|0033)[1-9]\d{8}$/.test(phoneClean);
+
     if (!fullName || !email || !phone || !address || !zipCode || !city) {
       alert("Veuillez remplir vos coordonnées pour recevoir l'estimation.");
+      return;
+    }
+
+    if (!emailIsValid) {
+      alert("Veuillez saisir une adresse e-mail valide (ex: jean@email.com).");
+      return;
+    }
+
+    if (!phoneIsValid) {
+      alert("Veuillez saisir un numéro de téléphone valide (ex: 06 12 34 56 78).");
       return;
     }
 
@@ -554,8 +570,17 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="ex: 06 12 34 56 78"
-                      className="w-full bg-white/60 border border-slate-200/50 rounded-xl p-2.5 text-xs font-semibold focus:bg-white/95 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:outline-none transition"
+                      className={`w-full bg-white/60 border rounded-xl p-2.5 text-xs font-semibold focus:bg-white/95 focus:ring-2 focus:outline-none transition ${
+                        phone && !/^(?:0|\+33|0033)[1-9]\d{8}$/.test(phone.replace(/[\s\(\)\.-]/g, ''))
+                          ? 'border-red-500 bg-red-50/10 text-red-900 focus:ring-red-500/20 focus:border-red-500'
+                          : 'border-slate-200/50 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
+                      }`}
                     />
+                    {phone && !/^(?:0|\+33|0033)[1-9]\d{8}$/.test(phone.replace(/[\s\(\)\.-]/g, '')) && (
+                      <p className="text-[10px] text-red-500 font-bold mt-1 font-sans">
+                        Numéro de téléphone invalide (ex: 0612345678)
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-slate-600 mb-1">Email *</label>
@@ -565,8 +590,17 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
                       placeholder="ex: jean@email.com"
-                      className="w-full bg-white/60 border border-slate-200/50 rounded-xl p-2.5 text-xs font-semibold focus:bg-white/95 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:outline-none transition"
+                      className={`w-full bg-white/60 border rounded-xl p-2.5 text-xs font-semibold focus:bg-white/95 focus:ring-2 focus:outline-none transition ${
+                        email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+                          ? 'border-red-500 bg-red-50/10 text-red-900 focus:ring-red-500/20 focus:border-red-500'
+                          : 'border-slate-200/50 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
+                      }`}
                     />
+                    {email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) && (
+                      <p className="text-[10px] text-red-500 font-bold mt-1 font-sans">
+                        Format e-mail invalide (ex: jean@email.com)
+                      </p>
+                    )}
                   </div>
                 </div>
 

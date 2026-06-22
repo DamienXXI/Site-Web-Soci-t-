@@ -6,7 +6,7 @@ interface NettoyageCalculatorProps {
 }
 
 export default function NettoyageCalculator({ onQuoteRequest }: NettoyageCalculatorProps) {
-  const [nettoyageM2, setNettoyageM2] = useState<number>(60);
+  const [nettoyageM2, setNettoyageM2] = useState<number>(0);
   const [nettoyageType, setNettoyageType] = useState<'appartement' | 'maison'>('appartement');
   const [nettoyageSalete, setNettoyageSalete] = useState<'propre' | 'standard' | 'tres-sale'>('standard');
   const [netOptionCave, setNetOptionCave] = useState<boolean>(false);
@@ -17,17 +17,21 @@ export default function NettoyageCalculator({ onQuoteRequest }: NettoyageCalcula
     ? (nettoyageSalete === 'propre' ? 5 : nettoyageSalete === 'standard' ? 8 : 15)
     : (nettoyageSalete === 'propre' ? 6 : nettoyageSalete === 'standard' ? 10 : 18);
   
-  let totalNettoyagePrice = Math.round(nettoyageM2 * pricePerM2);
-  if (netOptionCave) totalNettoyagePrice += 50;
-  if (netOptionDesinfection) totalNettoyagePrice += 90;
-  totalNettoyagePrice = Math.max(120, totalNettoyagePrice);
+  let totalNettoyagePrice = nettoyageM2 > 0 ? Math.round(nettoyageM2 * pricePerM2) : 0;
+  if (nettoyageM2 > 0) {
+    if (netOptionCave) totalNettoyagePrice += 50;
+    if (netOptionDesinfection) totalNettoyagePrice += 90;
+    totalNettoyagePrice = Math.max(120, totalNettoyagePrice);
+  } else {
+    totalNettoyagePrice = 0;
+  }
   
-  const estimatedNettoyageHours = Math.ceil(
+  const estimatedNettoyageHours = nettoyageM2 > 0 ? Math.ceil(
     (nettoyageM2 * (nettoyageSalete === 'propre' ? 0.05 : nettoyageSalete === 'standard' ? 0.08 : 0.16)) + 
     (nettoyageType === 'maison' ? 1.5 : 0.5) +
     (netOptionCave ? 1.5 : 0) +
     (netOptionDesinfection ? 1.0 : 0)
-  );
+  ) : 0;
 
   return (
     <div id="simulateur-nettoyage-inner" className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start text-left">
@@ -73,10 +77,10 @@ export default function NettoyageCalculator({ onQuoteRequest }: NettoyageCalcula
             <div className="flex items-center gap-1.5 bg-slate-100 border border-slate-200 px-3 py-1 rounded-lg">
               <input
                 type="number"
-                min="10"
+                min="0"
                 max="400"
                 value={nettoyageM2}
-                onChange={(e) => setNettoyageM2(Math.max(10, parseInt(e.target.value) || 10))}
+                onChange={(e) => setNettoyageM2(Math.max(0, parseInt(e.target.value) || 0))}
                 className="w-12 text-right font-black text-slate-900 bg-transparent outline-none text-xs sm:text-sm font-sans"
               />
               <span className="text-xs font-bold text-slate-500">m²</span>
@@ -84,15 +88,15 @@ export default function NettoyageCalculator({ onQuoteRequest }: NettoyageCalcula
           </div>
           <input
             type="range"
-            min="10"
+            min="0"
             max="300"
             step="5"
             value={nettoyageM2}
-            onChange={(e) => setNettoyageM2(parseInt(e.target.value))}
+            onChange={(e) => setNettoyageM2(parseInt(e.target.value) || 0)}
             className="w-full accent-emerald-600 h-1.5 bg-slate-100 rounded-lg appearance-none cursor-pointer"
           />
           <div className="flex justify-between text-[10px] font-bold text-slate-400 font-sans">
-            <span>10 m²</span>
+            <span>0 m²</span>
             <span>100 m²</span>
             <span>200 m²</span>
             <span>300 m²</span>

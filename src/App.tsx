@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   Phone,
   Calendar,
@@ -37,14 +38,26 @@ import {
   Check,
   Trash2
 } from 'lucide-react';
-import VolumeCalculator from './components/VolumeCalculator';
-import DemenagementCalculator from './components/DemenagementCalculator';
-import NettoyageCalculator from './components/NettoyageCalculator';
-import PartiesCommunesCalculator from './components/PartiesCommunesCalculator';
-import AutresPrestations from './components/AutresPrestations';
-import InterventionZoneMap from './components/InterventionZoneMap';
-import MyRequestsDrawer from './components/MyRequestsDrawer';
-import AccountComponent from './components/AccountComponent';
+// Lazy-loaded components for optimal performance on mobile networks
+const VolumeCalculator = React.lazy(() => import('./components/VolumeCalculator'));
+const DemenagementCalculator = React.lazy(() => import('./components/DemenagementCalculator'));
+const NettoyageCalculator = React.lazy(() => import('./components/NettoyageCalculator'));
+const PartiesCommunesCalculator = React.lazy(() => import('./components/PartiesCommunesCalculator'));
+const AutresPrestations = React.lazy(() => import('./components/AutresPrestations'));
+const InterventionZoneMap = React.lazy(() => import('./components/InterventionZoneMap'));
+const MyRequestsDrawer = React.lazy(() => import('./components/MyRequestsDrawer'));
+const AccountComponent = React.lazy(() => import('./components/AccountComponent'));
+
+// Smooth modern transition loader skeleton/spinner
+const LoadingSpinner = () => (
+  <div className="flex flex-col items-center justify-center p-12 min-h-[250px] space-y-4">
+    <div className="relative w-10 h-10">
+      <div className="absolute inset-0 rounded-full border-4 border-slate-100/30 animate-pulse"></div>
+      <div className="absolute inset-0 rounded-full border-4 border-emerald-600 border-t-transparent animate-spin"></div>
+    </div>
+    <span className="text-xs font-semibold text-slate-500 animate-pulse font-sans">Chargement...</span>
+  </div>
+);
 import { TESTIMONIALS } from './data';
 import { QuoteRequest } from './types';
 
@@ -97,7 +110,7 @@ export default function App() {
 
   // Modals
   const [activeModal, setActiveModal] = useState<'legals' | 'privacy' | 'recycling' | 'estimation' | null>(null);
-  const [showWelcomePopup, setShowWelcomePopup] = useState<boolean>(true);
+  const [showWelcomePopup, setShowWelcomePopup] = useState<boolean>(false);
 
   // Homepage Calculators Tab
   const [activeHomeCalcTab, setActiveHomeCalcTab] = useState<'encombrants' | 'demenagement' | 'nettoyage' | 'parties-communes'>('encombrants');
@@ -152,6 +165,76 @@ export default function App() {
       setReviews(TESTIMONIALS);
     }
   }, []);
+
+  useEffect(() => {
+    // Dynamic titles, descriptions and keywords based on current page for local SEO (Gironde / Bordeaux)
+    const pageMeta: Record<string, { title: string; description: string; keywords: string }> = {
+      accueil: {
+        title: "Damien Pommier | Débarras, Nettoyage & Déménagement en Gironde (33)",
+        description: "Services professionnels de débarras de maison, enlèvement d'encombrants, nettoyage de logement et aide au déménagement en Gironde et région bordelaise. Devis gratuit sous 24h.",
+        keywords: "débarras gironde, débarras maison bordeaux, enlèvement encombrants, déménagement bordeaux, nettoyage maison gironde, vide maison gironde, débarras gratuit"
+      },
+      enlevements: {
+        title: "Enlèvement d'encombrants & Débarras de Maison | Gironde",
+        description: "Besoin de vider une maison, un appartement ou de faire enlever vos encombrants en Gironde ? Découvrez notre service de débarras sur mesure et éco-responsable.",
+        keywords: "enlèvement encombrants bordeaux, debarras maison 33, vide maison bordeaux, débarras appartement gironde, debarras cave bordeaux, debarras gratuit"
+      },
+      nettoyage: {
+        title: "Nettoyage Extrême, Diogène & Ménage de Printemps | Bordeaux (33)",
+        description: "Prestations spécialisées de nettoyage en Gironde : nettoyage après déménagement, ménage de printemps, syndromes de Diogène, et désinfection de logement insalubre.",
+        keywords: "nettoyage diogene bordeaux, nettoyage maison gironde, nettoyage insalubre bordeaux, desinfection logement gironde, nettoyage fin de chantier, menage"
+      },
+      'parties-communes': {
+        title: "Entretien & Nettoyage de Parties Communes de Copropriétés | Gironde",
+        description: "Entretien régulier et nettoyage professionnel des parties communes d'immeubles et copropriétés en Gironde. Sortie de poubelles, vitres, et cages d'escalier.",
+        keywords: "entretien copropriete bordeaux, nettoyage hall immeuble gironde, sortie poubelles bordeaux, entretien parties communes gironde, syndic immeuble 33"
+      },
+      fonctionnement: {
+        title: "Comment ça marche ? Nos Débarras & Déménagements pas à pas",
+        description: "Découvrez notre processus clair et professionnel de la prise de contact à l'enlèvement de vos encombrants, tri éco-responsable et valorisation en Gironde.",
+        keywords: "processus debarras bordeaux, fonctionnement debarras gironde, devis débarras gratuit, valorisation dechets gironde, tri éco-responsable"
+      },
+      demenagement: {
+        title: "Aide au Déménagement & Transport de Volumes en Gironde (33)",
+        description: "Service de transport de meubles, aide au déménagement et portage de charges lourdes en Gironde. Calculateur de volume en ligne et devis instantané.",
+        keywords: "aide demenagement bordeaux, transport de meubles gironde, location camion avec chauffeur bordeaux, demenagement pas cher gironde, portage de meubles"
+      },
+      'autres-prestations': {
+        title: "Prestations Extérieures & Petits Travaux de Jardinage | Gironde",
+        description: "Prestations de terrassement, nivellement de terrain, nettoyage de terrasses et terrassement paysager en Gironde. Services de proximité de qualité.",
+        keywords: "terrassement jardin bordeaux, nettoyage terrasse gironde, nivellement terrain bordeaux, dessouchage gironde, travaux exterieurs gironde"
+      },
+      compte: {
+        title: "Mon Espace Client | Damien Pommier Débarras & Services",
+        description: "Suivez vos demandes de devis de débarras, nettoyage et déménagement en Gironde directement depuis votre espace personnel ultra-sécurisé.",
+        keywords: "espace client debarras bordeaux, suivi devis debarras, compte utilisateur damien pommier"
+      }
+    };
+
+    const meta = pageMeta[currentPage] || pageMeta.accueil;
+
+    // 1. Update document title
+    document.title = meta.title;
+
+    // 2. Update/Create Meta Description
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.setAttribute('name', 'description');
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.setAttribute('content', meta.description);
+
+    // 3. Update/Create Meta Keywords
+    let metaKeywords = document.querySelector('meta[name="keywords"]');
+    if (!metaKeywords) {
+      metaKeywords = document.createElement('meta');
+      metaKeywords.setAttribute('name', 'keywords');
+      document.head.appendChild(metaKeywords);
+    }
+    metaKeywords.setAttribute('content', meta.keywords);
+
+  }, [currentPage]);
 
   const handleRefreshQuotes = () => {
     const stored = localStorage.getItem('debarras_quotes');
@@ -253,13 +336,13 @@ export default function App() {
               <div className="relative group py-4">
                 <button 
                   onClick={() => setCurrentPage('enlevements')}
-                  className={`text-sm font-extrabold uppercase tracking-wider transition cursor-pointer relative py-1 flex items-center gap-1.5 ${
+                  className={`text-sm font-extrabold uppercase tracking-wider relative py-1 flex items-center gap-1.5 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer ${
                     ['enlevements', 'nettoyage', 'parties-communes', 'demenagement', 'autres-prestations'].includes(currentPage)
                       ? 'text-emerald-700 font-black font-sans' 
                       : 'text-slate-600 hover:text-emerald-700 font-sans'
                   }`}
                 >
-                  <span>Mes Prestations</span>
+                  <span>Prestations</span>
                   <svg className="w-3.5 h-3.5 transition-transform duration-250 group-hover:rotate-180 text-slate-400 group-hover:text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="19 9l-7 7-7-7" />
                   </svg>
@@ -272,7 +355,7 @@ export default function App() {
                       onClick={() => {
                         setCurrentPage('enlevements');
                       }}
-                      className="p-3 text-left hover:bg-emerald-50/65 rounded-xl transition flex gap-2.5 items-start cursor-pointer group/item"
+                      className="p-3 text-left hover:bg-emerald-50/65 rounded-xl transition-all duration-200 flex gap-2.5 items-start cursor-pointer group/item hover:translate-x-1"
                     >
                       <span className="text-lg">📦</span>
                       <div>
@@ -282,36 +365,38 @@ export default function App() {
                     </button>
                     
                     <button
-                      onClick={() => {
-                        setCurrentPage('nettoyage');
-                      }}
-                      className="p-3 text-left hover:bg-emerald-50/65 rounded-xl transition flex gap-2.5 items-start cursor-pointer group/item"
+                      disabled
+                      className="p-3 text-left rounded-xl transition flex gap-2.5 items-start cursor-not-allowed opacity-40 select-none"
                     >
-                      <span className="text-lg">🧼</span>
+                      <span className="text-lg grayscale">🧼</span>
                       <div>
-                        <div className="font-extrabold text-slate-950 group-hover/item:text-emerald-700 transition font-sans">Nettoyage de logements</div>
-                        <div className="text-[10px] text-slate-400 font-semibold font-sans">Remise au propre de maisons & appartements</div>
+                        <div className="font-extrabold text-slate-400 font-sans flex items-center gap-1.5 flex-wrap">
+                          <span>Nettoyage de logements</span>
+                          <span className="px-1.5 py-0.5 text-[8px] bg-slate-100 dark:bg-slate-800 text-slate-500 rounded font-bold uppercase tracking-wider">prochainement</span>
+                        </div>
+                        <div className="text-[10px] text-slate-450 font-semibold font-sans">Remise au propre de maisons & appartements</div>
                       </div>
                     </button>
-
+ 
                     <button
-                      onClick={() => {
-                        setCurrentPage('parties-communes');
-                      }}
-                      className="p-3 text-left hover:bg-emerald-50/65 rounded-xl transition flex gap-2.5 items-start cursor-pointer group/item text-left"
+                      disabled
+                      className="p-3 text-left rounded-xl transition flex gap-2.5 items-start cursor-not-allowed opacity-40 select-none text-left"
                     >
-                      <span className="text-lg">🧹</span>
+                      <span className="text-lg grayscale">🧹</span>
                       <div>
-                        <div className="font-extrabold text-slate-950 group-hover/item:text-emerald-700 transition font-sans">Entretien des parties communes</div>
-                        <div className="text-[10px] text-slate-400 font-semibold font-sans">Lavage d'immeubles, désinfection halls & locaux poubelles</div>
+                        <div className="font-extrabold text-slate-400 font-sans flex items-center gap-1.5 flex-wrap">
+                          <span>Entretien des parties communes</span>
+                          <span className="px-1.5 py-0.5 text-[8px] bg-slate-100 dark:bg-slate-800 text-slate-500 rounded font-bold uppercase tracking-wider">prochainement</span>
+                        </div>
+                        <div className="text-[10px] text-slate-450 font-semibold font-sans">Lavage d'immeubles, désinfection halls & locaux poubelles</div>
                       </div>
                     </button>
-
+ 
                     <button
                       onClick={() => {
                         setCurrentPage('demenagement');
                       }}
-                      className="p-3 text-left hover:bg-emerald-50/65 rounded-xl transition flex gap-2.5 items-start cursor-pointer group/item border-t border-slate-100"
+                      className="p-3 text-left hover:bg-emerald-50/65 rounded-xl transition-all duration-200 flex gap-2.5 items-start cursor-pointer group/item border-t border-slate-100 hover:translate-x-1"
                     >
                       <span className="text-lg">🚚</span>
                       <div>
@@ -319,7 +404,7 @@ export default function App() {
                         <div className="text-[10px] text-slate-400 font-semibold font-sans">Calculateur de trajet & d'objets de déménagement</div>
                       </div>
                     </button>
-
+ 
                     <button
                       disabled
                       className="p-3 text-left rounded-xl transition flex gap-2.5 items-start cursor-not-allowed opacity-40 border-t border-slate-100 select-none"
@@ -336,10 +421,10 @@ export default function App() {
                   </div>
                 </div>
               </div>
-
+ 
               <button 
                 onClick={() => setCurrentPage('compte')}
-                className={`text-sm font-extrabold uppercase tracking-wider transition cursor-pointer relative py-1 px-3 rounded-lg flex items-center gap-1.5 font-sans ${
+                className={`text-sm font-extrabold uppercase tracking-wider cursor-pointer relative py-1 px-3 rounded-lg flex items-center gap-1.5 font-sans transition-all duration-200 hover:-translate-y-0.5 hover:bg-slate-50 ${
                   currentPage === 'compte' 
                     ? 'text-emerald-700 font-black bg-emerald-50 border border-emerald-100/55' 
                     : 'text-slate-600 hover:text-emerald-700'
@@ -351,7 +436,7 @@ export default function App() {
               
               <button 
                 onClick={() => setActiveModal('estimation')}
-                className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-4.5 py-2 rounded-full font-black uppercase tracking-wide transition flex items-center gap-1.5 shadow-md shadow-emerald-500/10 hover:shadow-emerald-500/20 hover:scale-[1.02] transform cursor-pointer"
+                className="text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-4.5 py-2 rounded-full font-black uppercase tracking-wide flex items-center gap-1.5 shadow-md shadow-emerald-500/10 hover:shadow-emerald-500/20 transform cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.03]"
               >
                 Obtenir une estimation
               </button>
@@ -382,95 +467,93 @@ export default function App() {
         </div>
 
         {/* Mobile Navigation Panel */}
-        {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-100 bg-white px-4 pt-4 pb-6 space-y-4 shadow-xl">
-            <div>
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25, ease: 'easeInOut' }}
+              className="lg:hidden border-t border-slate-100 bg-white px-4 pt-4 pb-6 space-y-4 shadow-xl overflow-hidden"
+            >
+              <div>
+                <button
+                  onClick={() => { setCurrentPage('enlevements'); setMobileMenuOpen(false); }}
+                  className={`w-full text-left block p-3 text-sm font-black rounded-xl cursor-pointer transition-all duration-200 hover:translate-x-1 ${
+                    ['enlevements', 'nettoyage', 'parties-communes', 'demenagement', 'autres-prestations'].includes(currentPage) ? 'text-emerald-800 bg-emerald-50 border border-emerald-100/50' : 'text-slate-700 hover:bg-slate-50'
+                  }`}
+                >
+                  Prestations & Services
+                </button>
+                <div className="pl-4 pr-1 mt-2 space-y-1.5 text-xs">
+                  <button
+                    onClick={() => {
+                      setCurrentPage('enlevements');
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`w-full text-left py-2 px-3 rounded-lg block font-semibold transition-all duration-200 hover:translate-x-1.5 ${
+                      currentPage === 'enlevements' ? 'text-emerald-700 bg-emerald-50/60 font-bold' : 'text-slate-600 hover:text-emerald-600'
+                    }`}
+                  >
+                    📦 Enlèvement d'encombrants
+                  </button>
+                  <button
+                    disabled
+                    className="w-full text-left py-2 px-3 rounded-lg block font-semibold opacity-40 cursor-not-allowed select-none text-slate-450"
+                  >
+                    🧼 Nettoyage logements <span className="ml-1 px-1.5 py-0.5 text-[8px] bg-slate-200 text-slate-600 rounded font-black uppercase tracking-wider select-none">prochainement</span>
+                  </button>
+                  <button
+                    disabled
+                    className="w-full text-left py-2 px-3 rounded-lg block font-semibold opacity-40 cursor-not-allowed select-none text-slate-450"
+                  >
+                    🧹 Entretien des parties comm. <span className="ml-1 px-1.5 py-0.5 text-[8px] bg-slate-200 text-slate-600 rounded font-black uppercase tracking-wider select-none">prochainement</span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      setCurrentPage('demenagement');
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`w-full text-left py-2 px-3 rounded-lg block font-semibold transition-all duration-200 hover:translate-x-1.5 ${
+                      currentPage === 'demenagement' ? 'text-emerald-700 bg-emerald-50/60 font-bold' : 'text-slate-600 hover:text-emerald-600'
+                    }`}
+                  >
+                    🚚 Service de déménagement
+                  </button>
+                  <button
+                    disabled
+                    className="w-full text-left py-2 px-3 rounded-lg block font-semibold opacity-40 cursor-not-allowed select-none text-slate-450"
+                  >
+                    🛠️ Autres prestations de service <span className="ml-1 px-1.5 py-0.5 text-[8px] bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded font-black uppercase tracking-wider select-none">prochainement</span>
+                  </button>
+                </div>
+              </div>
+
               <button
-                onClick={() => { setCurrentPage('enlevements'); setMobileMenuOpen(false); }}
-                className={`w-full text-left block p-3 text-sm font-black rounded-xl cursor-pointer ${
-                  ['enlevements', 'nettoyage', 'parties-communes', 'demenagement', 'autres-prestations'].includes(currentPage) ? 'text-emerald-800 bg-emerald-50 border border-emerald-100/50' : 'text-slate-700 hover:bg-slate-50'
+                onClick={() => { setCurrentPage('compte'); setMobileMenuOpen(false); }}
+                className={`w-full text-left block p-3 text-sm font-black rounded-xl cursor-pointer transition-all duration-200 hover:translate-x-1 ${
+                  currentPage === 'compte' ? 'text-emerald-800 bg-emerald-50 border border-emerald-100/50' : 'text-slate-700 hover:bg-slate-50'
                 }`}
               >
-                Mes Prestations & Services
+                👤 Mon Compte
               </button>
-              <div className="pl-4 pr-1 mt-2 space-y-1.5 text-xs">
+              <div className="pt-2 flex flex-col gap-2">
                 <button
-                  onClick={() => {
-                    setCurrentPage('enlevements');
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`w-full text-left py-2 px-3 rounded-lg block font-semibold ${
-                    currentPage === 'enlevements' ? 'text-emerald-700 bg-emerald-50/60 font-bold' : 'text-slate-600 hover:text-emerald-600'
-                  }`}
+                  onClick={() => { setActiveModal('estimation'); setMobileMenuOpen(false); }}
+                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-center text-xs font-black uppercase tracking-wider shadow-lg shadow-emerald-500/15 block cursor-pointer transition-all duration-200 hover:translate-x-1 hover:scale-[1.01]"
                 >
-                  📦 Enlèvement d'encombrants
+                  ✨ Obtenir une estimation
                 </button>
-                <button
-                  onClick={() => {
-                    setCurrentPage('nettoyage');
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`w-full text-left py-2 px-3 rounded-lg block font-semibold ${
-                    currentPage === 'nettoyage' ? 'text-emerald-700 bg-emerald-50/60 font-bold' : 'text-slate-600 hover:text-emerald-600'
-                  }`}
+                <a
+                  href="tel:0661292059"
+                  className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-center text-xs font-black uppercase tracking-wider block transition-all duration-200 hover:translate-x-1"
                 >
-                  🧼 Nettoyage logements (Maisons, Appartements)
-                </button>
-                <button
-                  onClick={() => {
-                    setCurrentPage('parties-communes');
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`w-full text-left py-2 px-3 rounded-lg block font-semibold ${
-                    currentPage === 'parties-communes' ? 'text-emerald-700 bg-emerald-50/60 font-bold' : 'text-slate-600 hover:text-emerald-600'
-                  }`}
-                >
-                  🧹 Entretien des parties communes
-                </button>
-                <button
-                  onClick={() => {
-                    setCurrentPage('demenagement');
-                    setMobileMenuOpen(false);
-                  }}
-                  className={`w-full text-left py-2 px-3 rounded-lg block font-semibold ${
-                    currentPage === 'demenagement' ? 'text-emerald-700 bg-emerald-50/60 font-bold' : 'text-slate-600 hover:text-emerald-600'
-                  }`}
-                >
-                  🚚 Service de déménagement
-                </button>
-                <button
-                  disabled
-                  className="w-full text-left py-2 px-3 rounded-lg block font-semibold opacity-40 cursor-not-allowed select-none text-slate-450"
-                >
-                  🛠️ Autres prestations de service <span className="ml-1 px-1.5 py-0.5 text-[8px] bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded font-black uppercase tracking-wider select-none">prochainement</span>
-                </button>
+                  📞 Appeler : 06 61 29 20 59
+                </a>
               </div>
-            </div>
-
-            <button
-              onClick={() => { setCurrentPage('compte'); setMobileMenuOpen(false); }}
-              className={`w-full text-left block p-3 text-sm font-black rounded-xl cursor-pointer ${
-                currentPage === 'compte' ? 'text-emerald-800 bg-emerald-50 border border-emerald-100/50' : 'text-slate-700 hover:bg-slate-50'
-              }`}
-            >
-              👤 Mon Compte
-            </button>
-            <div className="pt-2 flex flex-col gap-2">
-              <button
-                onClick={() => { setActiveModal('estimation'); setMobileMenuOpen(false); }}
-                className="w-full py-3 bg-emerald-600 text-white rounded-xl text-center text-xs font-black uppercase tracking-wider shadow-lg shadow-emerald-500/15 block cursor-pointer"
-              >
-                ✨ Obtenir une estimation
-              </button>
-              <a
-                href="tel:0661292059"
-                className="w-full py-3 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-center text-xs font-black uppercase tracking-wider block"
-              >
-                📞 Appeler : 06 61 29 20 59
-              </a>
-            </div>
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* Conditionally rendered page content */}
@@ -518,51 +601,45 @@ export default function App() {
                 </div>
 
                 {/* Card 2: Nettoyage Logement */}
-                <div className="bg-white rounded-3xl p-6 border border-slate-150 shadow-xs hover:shadow-lg hover:border-emerald-300/40 transition-all duration-300 flex flex-col justify-between h-full group">
+                <div className="bg-slate-50/50 rounded-3xl p-6 border border-slate-200/60 flex flex-col justify-between h-full opacity-60 select-none">
                   <div className="space-y-3">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform duration-200">
+                    <div className="w-12 h-12 rounded-xl bg-slate-200/50 border border-slate-300/40 flex items-center justify-center text-2xl grayscale">
                       🧼
                     </div>
-                    <h3 className="font-display font-extrabold text-slate-900 text-lg">
-                      Nettoyage Logements
+                    <h3 className="font-display font-extrabold text-slate-500 text-lg flex items-center gap-1.5 flex-wrap">
+                      <span>Nettoyage Logements</span>
+                      <span className="px-1.5 py-0.5 text-[8px] bg-slate-200 text-slate-600 rounded font-bold uppercase tracking-wider">prochainement</span>
                     </h3>
-                    <p className="text-slate-500 text-xs sm:text-sm leading-relaxed font-sans font-medium">
+                    <p className="text-slate-450 text-xs sm:text-sm leading-relaxed font-sans font-medium">
                       Ménage minutieux de fin de bail, de chantier ou traitement de salubrité diogène de vos appartements ou maisons.
                     </p>
                   </div>
-                  <button
-                    onClick={() => {
-                      setCurrentPage('nettoyage');
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className="mt-6 pt-4 border-t border-slate-100 font-extrabold text-xs uppercase tracking-wider text-emerald-600 hover:text-emerald-700 flex items-center justify-between cursor-pointer w-full"
+                  <div
+                    className="mt-6 pt-4 border-t border-slate-150 font-extrabold text-xs uppercase tracking-wider text-slate-400 flex items-center justify-between cursor-not-allowed w-full"
                   >
-                    <span>Voir ce service</span> <ArrowRight className="w-4 h-4" />
-                  </button>
+                    <span>Bientôt disponible</span>
+                  </div>
                 </div>
 
                 {/* Card 3: Entretien Parties Communes */}
-                <div className="bg-white rounded-3xl p-6 border border-slate-150 shadow-xs hover:shadow-lg hover:border-emerald-300/40 transition-all duration-300 flex flex-col justify-between h-full group">
+                <div className="bg-slate-50/50 rounded-3xl p-6 border border-slate-200/60 flex flex-col justify-between h-full opacity-60 select-none">
                   <div className="space-y-3">
-                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform duration-200">
+                    <div className="w-12 h-12 rounded-xl bg-slate-200/50 border border-slate-300/40 flex items-center justify-center text-2xl grayscale">
                       🧹
                     </div>
-                    <h3 className="font-display font-extrabold text-slate-900 text-lg">
-                      Parties Communes
+                    <h3 className="font-display font-extrabold text-slate-500 text-lg flex items-center gap-1.5 flex-wrap">
+                      <span>Parties Communes</span>
+                      <span className="px-1.5 py-0.5 text-[8px] bg-slate-200 text-slate-600 rounded font-bold uppercase tracking-wider">prochainement</span>
                     </h3>
-                    <p className="text-slate-500 text-xs sm:text-sm leading-relaxed font-sans font-medium">
+                    <p className="text-slate-450 text-xs sm:text-sm leading-relaxed font-sans font-medium">
                       Contrat d'entretien pour immeubles de copropriété. Balayage hebdomadaire, lavage des halls et gestion des bacs poubelles.
                     </p>
                   </div>
-                  <button
-                    onClick={() => {
-                      setCurrentPage('parties-communes');
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    }}
-                    className="mt-6 pt-4 border-t border-slate-100 font-extrabold text-xs uppercase tracking-wider text-emerald-600 hover:text-emerald-700 flex items-center justify-between cursor-pointer w-full"
+                  <div
+                    className="mt-6 pt-4 border-t border-slate-150 font-extrabold text-xs uppercase tracking-wider text-slate-400 flex items-center justify-between cursor-not-allowed w-full"
                   >
-                    <span>Voir ce service</span> <ArrowRight className="w-4 h-4" />
-                  </button>
+                    <span>Bientôt disponible</span>
+                  </div>
                 </div>
 
                 {/* Card 4: Déménagement */}
@@ -632,44 +709,42 @@ export default function App() {
                     <span>🚚 Déménagement</span>
                   </button>
                   <button
-                    onClick={() => setActiveHomeCalcTab('nettoyage')}
-                    className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition cursor-pointer font-sans ${
-                      activeHomeCalcTab === 'nettoyage'
-                        ? 'bg-white text-emerald-800 shadow-sm border border-slate-200/30'
-                        : 'text-slate-500 hover:text-slate-900'
-                    }`}
+                    disabled
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition cursor-not-allowed font-sans opacity-40 select-none text-slate-400"
                   >
-                    <span>🧼 Nettoyage Logement</span>
+                    <span>🧼 Nettoyage <span className="ml-1 text-[8px] bg-slate-200 text-slate-600 px-1 py-0.5 rounded uppercase font-black">prochainement</span></span>
                   </button>
                   <button
-                    onClick={() => setActiveHomeCalcTab('parties-communes')}
-                    className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition cursor-pointer font-sans ${
-                      activeHomeCalcTab === 'parties-communes'
-                        ? 'bg-white text-emerald-800 shadow-sm border border-slate-200/30'
-                        : 'text-slate-500 hover:text-slate-900'
-                    }`}
+                    disabled
+                    className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl font-bold text-xs uppercase tracking-wider transition cursor-not-allowed font-sans opacity-40 select-none text-slate-400"
                   >
-                    <span>🏢 Parties Communes</span>
+                    <span>🏢 Parties Comm. <span className="ml-1 text-[8px] bg-slate-200 text-slate-600 px-1 py-0.5 rounded uppercase font-black">prochainement</span></span>
                   </button>
                 </div>
               </div>
 
               {/* Active Calculator widget */}
               <div className="bg-white/40 backdrop-blur-md rounded-4xl border border-slate-100 shadow-xs p-1 md:p-3">
-                {activeHomeCalcTab === 'encombrants' && (
-                  <VolumeCalculator onQuoteSubmitted={handleQuoteSubmitted} />
-                )}
-                {activeHomeCalcTab === 'demenagement' && (
-                  <DemenagementCalculator onQuoteSubmitted={handleQuoteSubmitted} />
-                )}
+                <React.Suspense fallback={<LoadingSpinner />}>
+                  {activeHomeCalcTab === 'encombrants' && (
+                    <VolumeCalculator onQuoteSubmitted={handleQuoteSubmitted} />
+                  )}
+                  {activeHomeCalcTab === 'demenagement' && (
+                    <DemenagementCalculator onQuoteSubmitted={handleQuoteSubmitted} />
+                  )}
+                </React.Suspense>
                 {activeHomeCalcTab === 'nettoyage' && (
-                  <div className="p-4 bg-slate-50/50 rounded-3xl border border-slate-100/50">
-                    <NettoyageCalculator onQuoteRequest={handleQuoteRequest} />
+                  <div className="p-8 text-center bg-slate-50/50 rounded-3xl border border-slate-150 py-16">
+                    <span className="text-4xl block mb-3 grayscale">🧼</span>
+                    <h4 className="font-display font-black text-slate-400 text-lg">Simulateur Nettoyage bientôt disponible</h4>
+                    <span className="mt-2 inline-block px-2.5 py-1 text-[10px] uppercase font-bold text-slate-500 bg-slate-200 rounded">prochainement</span>
                   </div>
                 )}
                 {activeHomeCalcTab === 'parties-communes' && (
-                  <div className="p-4 bg-slate-50/50 rounded-3xl border border-slate-100/50">
-                    <PartiesCommunesCalculator onQuoteRequest={handleQuoteRequest} />
+                  <div className="p-8 text-center bg-slate-50/50 rounded-3xl border border-slate-150 py-16">
+                    <span className="text-4xl block mb-3 grayscale">🏢</span>
+                    <h4 className="font-display font-black text-slate-400 text-lg">Simulateur Parties Communes bientôt disponible</h4>
+                    <span className="mt-2 inline-block px-2.5 py-1 text-[10px] uppercase font-bold text-slate-500 bg-slate-200 rounded">prochainement</span>
                   </div>
                 )}
               </div>
@@ -677,7 +752,9 @@ export default function App() {
           </section>
 
           {/* Section cartographique interactive de la zone d'intervention */}
-          <InterventionZoneMap />
+          <React.Suspense fallback={<LoadingSpinner />}>
+            <InterventionZoneMap />
+          </React.Suspense>
         </>
       )}
 
@@ -710,7 +787,7 @@ export default function App() {
                     <div className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mt-1 font-sans">Disponibilité</div>
                   </div>
                   <div className="p-3 bg-emerald-50/50 rounded-xl border border-emerald-100/40 text-center">
-                    <div className="text-2xl font-black text-emerald-700 font-display">100+</div>
+                    <div className="text-2xl font-black text-emerald-700 font-display">300+</div>
                     <div className="text-[9px] font-bold text-slate-500 uppercase tracking-wider mt-1 font-sans">Débarras Réalisés</div>
                   </div>
                 </div>
@@ -893,7 +970,9 @@ export default function App() {
                 </p>
               </div>
               <div className="bg-white/40 backdrop-blur-md rounded-4xl border border-slate-100 shadow-xs p-1 md:p-3">
-                <VolumeCalculator onQuoteSubmitted={handleQuoteSubmitted} />
+                <React.Suspense fallback={<LoadingSpinner />}>
+                  <VolumeCalculator onQuoteSubmitted={handleQuoteSubmitted} />
+                </React.Suspense>
               </div>
             </div>
           </div>
@@ -991,7 +1070,9 @@ export default function App() {
                   Estimez le budget de votre nettoyage résidentiel en temps réel en ajustant les paramètres ci-dessous.
                 </p>
               </div>
-              <NettoyageCalculator onQuoteRequest={handleQuoteRequest} />
+              <React.Suspense fallback={<LoadingSpinner />}>
+                <NettoyageCalculator onQuoteRequest={handleQuoteRequest} />
+              </React.Suspense>
             </div>
           </div>
         </section>
@@ -1094,7 +1175,9 @@ export default function App() {
                   Estimez instantanément le budget récurrent pour l'entretien de votre copropriété résidentielle.
                 </p>
               </div>
-              <PartiesCommunesCalculator onQuoteRequest={handleQuoteRequest} />
+              <React.Suspense fallback={<LoadingSpinner />}>
+                <PartiesCommunesCalculator onQuoteRequest={handleQuoteRequest} />
+              </React.Suspense>
             </div>
 
           </div>
@@ -1103,7 +1186,9 @@ export default function App() {
 
       {currentPage === 'compte' && (
         <section className="bg-slate-50/50">
-          <AccountComponent />
+          <React.Suspense fallback={<LoadingSpinner />}>
+            <AccountComponent />
+          </React.Suspense>
         </section>
       )}
 
@@ -1126,13 +1211,17 @@ export default function App() {
             </p>
           </div>
 
-          <DemenagementCalculator onQuoteSubmitted={handleQuoteSubmitted} />
+          <React.Suspense fallback={<LoadingSpinner />}>
+            <DemenagementCalculator onQuoteSubmitted={handleQuoteSubmitted} />
+          </React.Suspense>
 
           </section>
       )}
 
       {currentPage === 'autres-prestations' && (
-        <AutresPrestations onQuoteSubmitted={handleQuoteSubmitted} />
+        <React.Suspense fallback={<LoadingSpinner />}>
+          <AutresPrestations onQuoteSubmitted={handleQuoteSubmitted} />
+        </React.Suspense>
       )}
 
       {/* Beautiful styled premium footer with modal anchors */}
@@ -1150,7 +1239,9 @@ export default function App() {
                 <span className="font-display font-black text-slate-100 text-lg tracking-tight">Damien Pommier</span>
               </div>
               <p className="text-slate-500 text-xs leading-relaxed max-w-sm font-semibold">
-                Spécialiste de l'enlèvement des encombrants, du nettoyage technique de logements, du déménagement et de l'entretien des parties communes en Gironde. Une rigueur professionnelle au service des particuliers et syndics.
+                Spécialiste de l'enlèvement des encombrants.
+                <br />
+                Une rigueur professionnelle au service des agences immobilières (syndics, gestion locative, bailleurs sociaux) & des particuliers.
               </p>
             </div>
 
@@ -1167,20 +1258,14 @@ export default function App() {
                   </button>
                 </li>
                 <li>
-                  <button 
-                    onClick={() => { setCurrentPage('nettoyage'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
-                    className="hover:text-emerald-500 transition cursor-pointer text-left flex items-center gap-1.5"
-                  >
-                    <span>🧼</span> Nettoyage Logement
-                  </button>
+                  <span className="text-slate-400 select-none flex items-center gap-1.5 cursor-not-allowed opacity-60">
+                    <span className="grayscale">🧼</span> Nettoyage Logement <span className="text-[8px] bg-slate-800 text-slate-400 px-1 py-0.5 rounded uppercase font-black font-sans leading-none">bientôt</span>
+                  </span>
                 </li>
                 <li>
-                  <button 
-                    onClick={() => { setCurrentPage('parties-communes'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
-                    className="hover:text-emerald-500 transition cursor-pointer text-left flex items-center gap-1.5"
-                  >
-                    <span>🧹</span> Entretien Parties Communes
-                  </button>
+                  <span className="text-slate-400 select-none flex items-center gap-1.5 cursor-not-allowed opacity-60">
+                    <span className="grayscale">🧹</span> Entretien Parties Communes <span className="text-[8px] bg-slate-800 text-slate-400 px-1 py-0.5 rounded uppercase font-black font-sans leading-none">bientôt</span>
+                  </span>
                 </li>
                 <li>
                   <button 
@@ -1213,6 +1298,8 @@ export default function App() {
 
           </div>
 
+
+
           <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-600 text-[11px] font-semibold">
             <div>
               &copy; {new Date().getFullYear()} Damien Pommier. Tous droits réservés.
@@ -1226,13 +1313,15 @@ export default function App() {
       </footer>
 
       {/* Slide drawer for users requested quotes stored in localStorage */}
-      <MyRequestsDrawer
-        isOpen={isDrawerOpen}
-        onClose={() => setIsDrawerOpen(false)}
-        quotes={quotes}
-        onDeleteQuote={handleDeleteQuote}
-        onRefresh={handleRefreshQuotes}
-      />
+      <React.Suspense fallback={null}>
+        <MyRequestsDrawer
+          isOpen={isDrawerOpen}
+          onClose={() => setIsDrawerOpen(false)}
+          quotes={quotes}
+          onDeleteQuote={handleDeleteQuote}
+          onRefresh={handleRefreshQuotes}
+        />
+      </React.Suspense>
 
       {/* Modals of French Compliance */}
       {activeModal === 'legals' && (
@@ -1395,20 +1484,18 @@ export default function App() {
 
               {/* Option 2: Nettoyage */}
               <button
-                onClick={() => {
-                  setActiveModal(null);
-                  setCurrentPage('nettoyage');
-                }}
-                className="w-full p-4 text-left border border-slate-200/80 hover:border-emerald-300 bg-slate-50/50 hover:bg-emerald-50/30 rounded-2xl transition-all duration-200 flex items-start gap-4 cursor-pointer group/choice"
+                disabled
+                className="w-full p-4 text-left border border-slate-150 bg-slate-50/40 rounded-2xl flex items-start gap-4 cursor-not-allowed opacity-50 select-none"
               >
-                <div className="p-3 bg-emerald-100/60 text-emerald-800 rounded-xl group-hover/choice:bg-emerald-600 group-hover/choice:text-white transition-all duration-200 text-xl shrink-0">
+                <div className="p-3 bg-slate-100 text-slate-400 rounded-xl text-xl shrink-0 grayscale">
                   🧼
                 </div>
                 <div>
-                  <h5 className="font-display font-black text-slate-900 group-hover/choice:text-emerald-700 transition text-sm md:text-base">
-                    Nettoyage / Ménage de logements
+                  <h5 className="font-display font-black text-slate-450 text-sm md:text-base flex items-center gap-1.5 flex-wrap">
+                    <span>Nettoyage / Ménage de logements</span>
+                    <span className="px-1.5 py-0.5 text-[9px] bg-slate-200 text-slate-600 rounded font-bold uppercase tracking-wider">prochainement</span>
                   </h5>
-                  <p className="text-[11px] md:text-xs text-slate-500 mt-1 leading-relaxed font-sans font-medium">
+                  <p className="text-[11px] md:text-xs text-slate-450 mt-1 leading-relaxed font-sans font-medium">
                     Découvrez mes forfaits de nettoyage complets pour maisons & appartements (mise au propre, remise en état, syndrome de Diogène, etc.).
                   </p>
                 </div>
@@ -1467,63 +1554,7 @@ export default function App() {
         </div>
       )}
 
-      {/* Welcome Popup Modal */}
-      {showWelcomePopup && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in font-sans">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 md:p-8 shadow-2xl border border-slate-100 relative space-y-6 transform transition-all duration-300 scale-100">
-            {/* Close button X */}
-            <button
-              onClick={() => setShowWelcomePopup(false)}
-              className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-755 hover:bg-slate-100 rounded-full transition-colors cursor-pointer"
-              aria-label="Fermer"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
-            {/* Accent badge or illustration */}
-            <div className="mx-auto w-16 h-16 bg-emerald-100 rounded-2xl flex items-center justify-center text-3xl shadow-sm">
-              ✨
-            </div>
-
-            <div className="text-center space-y-2">
-              <h3 className="text-xl md:text-2xl font-black text-slate-900 leading-tight">
-                Bienvenue sur la plateforme de mes services !
-              </h3>
-            </div>
-
-            <p className="text-sm text-slate-600 leading-relaxed text-center font-medium">
-              Besoin d'un <strong>débarras</strong>, d'un <strong>nettoyage complet</strong>, d'un <strong>déménagement</strong> ou de l'entretien de 
-              vos <strong>parties communes</strong> ? 
-              <br />
-              <span className="mt-2 block">
-                Utilisez nos outils interactifs pour estimer gratuitement votre budget en quelques clics !
-              </span>
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
-              <button
-                onClick={() => {
-                  setShowWelcomePopup(false);
-                  setActiveModal('estimation');
-                }}
-                className="py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm md:text-xs lg:text-sm rounded-xl transition duration-200 shadow-md shadow-emerald-900/10 cursor-pointer flex items-center justify-center gap-1.5"
-              >
-                📊 Simuler un devis
-              </button>
-              <button
-                onClick={() => setShowWelcomePopup(false)}
-                className="py-3 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs sm:text-sm md:text-xs lg:text-sm rounded-xl transition duration-200 cursor-pointer"
-              >
-                Découvrir le site
-              </button>
-            </div>
-
-            <p className="text-[10px] text-slate-400 text-center italic font-medium">
-              * estimation gratuite et sans engagement de votre part
-            </p>
-          </div>
-        </div>
-      )}
+      {/* Welcome Popup Modal has been removed as requested */}
 
     </div>
   );

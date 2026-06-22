@@ -53,11 +53,32 @@ export default function AccountComponent({ onProfileUpdated }: AccountComponentP
 
   const handleSaveProfile = (e: React.FormEvent) => {
     e.preventDefault();
+
+    const emailClean = email.trim();
+    const phoneClean = phone.replace(/[\s\(\)\.-]/g, '');
+    const emailIsValid = !emailClean || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailClean);
+    const phoneIsValid = !phoneClean || /^(?:0|\+33|0033)[1-9]\d{8}$/.test(phoneClean);
+
+    if (!fullName || !email || !phone) {
+      alert("Veuillez remplir les informations obligatoires (Nom, Email, Téléphone).");
+      return;
+    }
+
+    if (!emailIsValid) {
+      alert("Veuillez saisir une adresse e-mail valide (ex: jean@email.com).");
+      return;
+    }
+
+    if (!phoneIsValid) {
+      alert("Veuillez saisir un numéro de téléphone valide (ex: 06 12 34 56 78).");
+      return;
+    }
+
     const profile = { fullName, email, phone, address, zipCode, city };
     localStorage.setItem('debarras_profile', JSON.stringify(profile));
     
     setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 4000);
+    setTimeout(() => setSaveSuccess(false), 4500);
 
     // Notify other components if needed
     if (onProfileUpdated) {
@@ -187,10 +208,19 @@ export default function AccountComponent({ onProfileUpdated }: AccountComponentP
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-3.5 text-xs font-semibold text-slate-800 outline-none focus:bg-white focus:ring-1 focus:ring-emerald-500"
+                      className={`w-full bg-slate-50 border rounded-xl py-2.5 pl-10 pr-3.5 text-xs font-semibold outline-none focus:bg-white focus:ring-1 ${
+                        email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())
+                          ? 'border-red-500 bg-red-50/10 text-red-900 focus:ring-red-500'
+                          : 'border-slate-200 focus:ring-emerald-500'
+                      }`}
                       placeholder="jean.dupont@email.com"
                     />
                   </div>
+                  {email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) && (
+                    <p className="text-[10px] text-red-500 font-bold mt-1.5 font-sans">
+                      Format e-mail invalide (ex: jean@email.com)
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -206,10 +236,19 @@ export default function AccountComponent({ onProfileUpdated }: AccountComponentP
                       required
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl py-2.5 pl-10 pr-3.5 text-xs font-semibold text-slate-800 outline-none focus:bg-white focus:ring-1 focus:ring-emerald-500"
+                      className={`w-full bg-slate-50 border rounded-xl py-2.5 pl-10 pr-3.5 text-xs font-semibold outline-none focus:bg-white focus:ring-1 ${
+                        phone && !/^(?:0|\+33|0033)[1-9]\d{8}$/.test(phone.replace(/[\s\(\)\.-]/g, ''))
+                          ? 'border-red-500 bg-red-50/10 text-red-900 focus:ring-red-500'
+                          : 'border-slate-200 focus:ring-emerald-500'
+                      }`}
                       placeholder="06 12 34 56 78"
                     />
                   </div>
+                  {phone && !/^(?:0|\+33|0033)[1-9]\d{8}$/.test(phone.replace(/[\s\(\)\.-]/g, '')) && (
+                    <p className="text-[10px] text-red-500 font-bold mt-1.5 font-sans">
+                      Numéro de téléphone invalide (ex: 0612345678)
+                    </p>
+                  )}
                 </div>
               </div>
 

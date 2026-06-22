@@ -19,20 +19,20 @@ interface DemenagementCalculatorProps {
 
 export default function DemenagementCalculator({ onQuoteSubmitted }: DemenagementCalculatorProps) {
   // States
-  const [demDepart, setDemDepart] = useState('Bordeaux');
-  const [demArrivee, setDemArrivee] = useState('Mérignac');
-  const [demDistance, setDemDistance] = useState(15);
+  const [demDepart, setDemDepart] = useState('');
+  const [demArrivee, setDemArrivee] = useState('');
+  const [demDistance, setDemDistance] = useState(0);
   const [demEtapes, setDemEtapes] = useState<string[]>([]);
   const [isCalculatingRoute, setIsCalculatingRoute] = useState(false);
   const [routeError, setRouteError] = useState<string | null>(null);
   const [hasSuccessfullyCalculated, setHasSuccessfullyCalculated] = useState(false);
-  const [demCartons, setDemCartons] = useState(10);
-  const [demMeubles, setDemMeubles] = useState(2);
-  const [demElectro, setDemElectro] = useState(1);
-  const [demDivers, setDemDivers] = useState(3);
-  const [demLits, setDemLits] = useState(1);
-  const [demTables, setDemTables] = useState(1);
-  const [demPetits, setDemPetits] = useState(2);
+  const [demCartons, setDemCartons] = useState(0);
+  const [demMeubles, setDemMeubles] = useState(0);
+  const [demElectro, setDemElectro] = useState(0);
+  const [demDivers, setDemDivers] = useState(0);
+  const [demLits, setDemLits] = useState(0);
+  const [demTables, setDemTables] = useState(0);
+  const [demPetits, setDemPetits] = useState(0);
   const [demVelos, setDemVelos] = useState(0);
   const [demCustomItems, setDemCustomItems] = useState<{ id: string; name: string; quantity: number; m3: number; width?: string; length?: string; height?: string }[]>([]);
   
@@ -270,10 +270,10 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                 <Calculator className="absolute left-3 top-3 w-4 h-4 text-slate-400" />
                 <input
                   type="number"
-                  min="1"
+                  min="0"
                   required
                   value={demDistance}
-                  onChange={(e) => setDemDistance(Math.max(1, parseInt(e.target.value) || 1))}
+                  onChange={(e) => setDemDistance(Math.max(0, parseInt(e.target.value) || 0))}
                   className="w-full bg-white border border-slate-200 rounded-xl py-2 pl-9 pr-3 text-xs focus:ring-1 focus:ring-emerald-500 font-bold text-slate-800"
                 />
               </div>
@@ -947,8 +947,24 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
             <form
               onSubmit={(e) => {
                 e.preventDefault();
+                
+                const emailClean = demEmail.trim();
+                const phoneClean = demPhone.replace(/[\s\(\)\.-]/g, '');
+                const emailIsValid = !emailClean || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailClean);
+                const phoneIsValid = !phoneClean || /^(?:0|\+33|0033)[1-9]\d{8}$/.test(phoneClean);
+
                 if (!demName || !demEmail || !demPhone) {
                   alert("Veuillez renseigner votre nom, e-mail et numéro de téléphone.");
+                  return;
+                }
+
+                if (!emailIsValid) {
+                  alert("Veuillez saisir une adresse e-mail valide (ex: jean@email.com).");
+                  return;
+                }
+
+                if (!phoneIsValid) {
+                  alert("Veuillez saisir un numéro de téléphone valide (ex: 06 12 34 56 78).");
                   return;
                 }
                 
@@ -1016,9 +1032,18 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                     required
                     value={demEmail}
                     onChange={(e) => setDemEmail(e.target.value)}
-                    className="w-full bg-white border border-slate-200/80 rounded-xl py-2 px-3 text-xs focus:ring-1 focus:ring-emerald-500 font-medium text-slate-850"
+                    className={`w-full bg-white border rounded-xl py-2 px-3 text-xs focus:outline-none focus:ring-1 font-medium text-slate-850 ${
+                      demEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(demEmail.trim())
+                        ? 'border-red-500 bg-red-50/10 text-red-900 focus:ring-red-500 focus:border-red-500'
+                        : 'border-slate-200/80 focus:ring-emerald-500'
+                    }`}
                     placeholder="jean@email.com"
                   />
+                  {demEmail && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(demEmail.trim()) && (
+                    <p className="text-[10px] text-red-500 font-bold mt-1 font-sans">
+                      Format e-mail invalide (ex: jean@email.com)
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Téléphone *</label>
@@ -1027,9 +1052,18 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                     required
                     value={demPhone}
                     onChange={(e) => setDemPhone(e.target.value)}
-                    className="w-full bg-white border border-slate-200/80 rounded-xl py-2 px-3 text-xs focus:ring-1 focus:ring-emerald-500 font-medium text-slate-850"
+                    className={`w-full bg-white border rounded-xl py-2 px-3 text-xs focus:outline-none focus:ring-1 font-medium text-slate-850 ${
+                      demPhone && !/^(?:0|\+33|0033)[1-9]\d{8}$/.test(demPhone.replace(/[\s\(\)\.-]/g, ''))
+                        ? 'border-red-500 bg-red-50/10 text-red-900 focus:ring-red-500 focus:border-red-500'
+                        : 'border-slate-200/80 focus:ring-emerald-500'
+                    }`}
                     placeholder="06 61 29 20 59"
                   />
+                  {demPhone && !/^(?:0|\+33|0033)[1-9]\d{8}$/.test(demPhone.replace(/[\s\(\)\.-]/g, '')) && (
+                    <p className="text-[10px] text-red-500 font-bold mt-1 font-sans">
+                      Numéro de téléphone invalide (ex: 0612345678)
+                    </p>
+                  )}
                 </div>
               </div>
 
