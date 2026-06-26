@@ -25,6 +25,8 @@ import {
   Clock,
   Sparkles,
   ChevronRight,
+  ChevronDown,
+  ChevronUp,
   User,
   MessageSquare,
   BookmarkCheck,
@@ -141,6 +143,22 @@ export default function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [quotes, setQuotes] = useState<QuoteRequest[]>([]);
+
+  // Collapsible zones d'intervention
+  const [isZonesExpanded, setIsZonesExpanded] = useState(false);
+
+  // Lead receiving configurations (Options 1, 2)
+  const [leadDestination, setLeadDestination] = useState<'local' | 'email'>(() => {
+    const stored = localStorage.getItem('pommier_lead_destination');
+    if (stored === 'email') return 'email';
+    return 'local';
+  });
+  const [web3FormsKey, setWeb3FormsKey] = useState(() => {
+    return localStorage.getItem('pommier_web3forms_key') || '';
+  });
+  const [formspreeEndpoint, setFormspreeEndpoint] = useState(() => {
+    return localStorage.getItem('pommier_formspree_endpoint') || '';
+  });
   
   // Déménagement Calculator states
   const [demDepart, setDemDepart] = useState('Bordeaux');
@@ -365,9 +383,141 @@ export default function App() {
   };
 
   const handleQuoteSubmitted = (newQuote: QuoteRequest) => {
-    // Append and open tracking panel to show instantaneous responsive validation
+    // 1. Front-end Validation: Prevent incomplete form submissions
+    if (!newQuote.fullName || !newQuote.fullName.trim()) {
+      alert("Erreur : Le nom complet est obligatoire pour soumettre la demande.");
+      return;
+    }
+    if (!newQuote.phone || !newQuote.phone.trim()) {
+      alert("Erreur : Le numéro de téléphone est obligatoire pour soumettre la demande.");
+      return;
+    }
+
+    // Option 1 is ALWAYS active as a base layer so the user can track their request in their browser
     setQuotes(prev => [newQuote, ...prev]);
     setIsDrawerOpen(true);
+
+    // Format descriptive message body for remote submissions (email or log)
+    let itemDetailsText = "";
+    if (newQuote.selectedItems) {
+      itemDetailsText = Object.entries(newQuote.selectedItems)
+        .filter(([_, qty]) => qty > 0)
+        .map(([itemId, qty]) => `• ${itemId}: ${qty}`)
+        .join("\n");
+    }
+
+    const emailSubject = `Nouveau Devis - ${newQuote.fullName} (${newQuote.city})`;
+    const emailBodyMessage = `
+Nouveau Devis Déposé par un Client depuis le site de Damien Pommier :
+------------------------------------
+Nom complet : ${newQuote.fullName}
+E-mail : ${newQuote.email || "Non renseigné"}
+Téléphone : ${newQuote.phone}
+Localisation : ${newQuote.zipCode} ${newQuote.city}
+Type de prestation : ${newQuote.serviceType}
+
+------------------------------------
+DÉTAILS DU CALCUL DE VOLUME & TARIFICATION :
+• Volume Global Estimé : ${newQuote.estimatedVolumeM3} m³
+• Tarif / Montant Estimé : ${newQuote.estimatedPrice || "Non calculé / À valider"}
+------------------------------------
+
+Configuration du lieu :
+• Étage : ${newQuote.floor} (Ascenseur : ${newQuote.hasElevator ? "Oui" : "Non"})
+• Distance de Parking : ${newQuote.parkingDistance}
+
+Détails complémentaires :
+${newQuote.additionalDetails || "Aucun détail complémentaire fourni."}
+
+Inventaire détaillé des objets sélectionnés :
+${itemDetailsText || "Aucun objet individuel sélectionné (estimation de volume direct ou formulaire déménagement)."}
+
+------------------------------------
+Demande générée le : ${new Date(newQuote.createdAt).toLocaleString('fr-FR')}
+Référence de suivi : ${newQuote.id}
+    `;
+
+    // Helper to convert base64 data URL to Blob
+    const dataURLtoBlob = (dataurl: string): Blob | null => {
+      try {
+        const arr = dataurl.split(',');
+        if (arr.length < 2) return null;
+        const mimeMatch = arr[0].match(/:(.*?);/);
+        if (!mimeMatch) return null;
+        const mime = mimeMatch[1];
+        const bstr = atob(arr[1]);
+        let n = bstr.length;
+        const u8arr = new Uint8Array(n);
+        while (n--) {
+          u8arr[n] = bstr.charCodeAt(n);
+        }
+        return new Blob([u8arr], { type: mime });
+      } catch (e) {
+        console.error("Error converting photo data URL to Blob:", e);
+        return null;
+      }
+    };
+
+    // Option 2: Direct Email via Web3Forms or Formspree
+    if (leadDestination === 'email') {
+      const isFormspree = !!formspreeEndpoint;
+      const endpoint = isFormspree ? formspreeEndpoint : "https://api.web3forms.com/submit";
+      
+      if (!isFormspree && !web3FormsKey) {
+        console.warn("Web3Forms Key is missing. Please configure it in the administration panel.");
+        alert("Configuration requise : Option E-mail sélectionnée mais aucune clé d'accès configurée. Allez dans le panneau d'administration pour renseigner votre clé Web3Forms ou Formspree.");
+        return;
+      }
+
+      // Use FormData to send actual files to email services
+      const formData = new FormData();
+      
+      // A valid email is required by submission platforms to prevent spam rejection (400)
+      const senderEmail = newQuote.email && newQuote.email.trim() ? newQuote.email.trim() : "no-reply@debarras-express.fr";
+      
+      if (isFormspree) {
+        formData.append("subject", emailSubject);
+        formData.append("name", newQuote.fullName);
+        formData.append("email", senderEmail);
+        formData.append("phone", newQuote.phone);
+        formData.append("message", emailBodyMessage);
+        formData.append("_subject", emailSubject);
+      } else {
+        formData.append("access_key", web3FormsKey || "");
+        formData.append("subject", emailSubject);
+        formData.append("from_name", "Demande De Devis");
+        formData.append("name", newQuote.fullName);
+        formData.append("email", senderEmail);
+        formData.append("phone", newQuote.phone);
+        formData.append("message", emailBodyMessage);
+      }
+
+      // Convert and append base64 photos as real attachments for Web3Forms/Formspree
+      if (newQuote.photos && newQuote.photos.length > 0) {
+        newQuote.photos.forEach((photoBase64, index) => {
+          const blob = dataURLtoBlob(photoBase64);
+          if (blob) {
+            const extension = blob.type.split('/')[1] || 'jpg';
+            // Web3forms supports file uploads. To upload multiple files via FormData, 
+            // the first field name can be 'attachment' and subsequent can be 'attachment_2', 'attachment_3', etc.
+            const fieldName = index === 0 ? 'attachment' : `attachment_${index + 1}`;
+            formData.append(fieldName, blob, `photo_${index + 1}.${extension}`);
+          }
+        });
+      }
+
+      fetch(endpoint, {
+        method: "POST",
+        body: formData // No Content-Type header - browser will set boundary automatically
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("HTTP error " + res.status);
+        console.log("Email submitted successfully with attachments via " + (isFormspree ? "Formspree" : "Web3Forms"));
+      })
+      .catch(err => {
+        console.error("Failed to send email lead:", err);
+      });
+    }
   };
 
   const handleReviewSubmit = (e: React.FormEvent) => {
@@ -1564,8 +1714,8 @@ export default function App() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-10 pb-12 border-b border-slate-900">
             
-            {/* Box 1: Brand & Logo (Saves 5 cols) */}
-            <div className="space-y-4 lg:col-span-5">
+            {/* Box 1: Brand & Logo (Saves 4 cols) */}
+            <div className="space-y-4 lg:col-span-4">
               <button 
                 onClick={() => {
                   setCurrentPage('accueil');
@@ -1589,8 +1739,8 @@ export default function App() {
               </p>
             </div>
 
-            {/* Box 2: Prestations quick navigations (Saves 4 cols) */}
-            <div className="space-y-4 lg:col-span-4">
+            {/* Box 2: Prestations quick navigations (Saves 2 cols) */}
+            <div className="space-y-4 lg:col-span-2">
               <h4 className="text-slate-200 text-xs font-black uppercase tracking-wider font-display">Prestations</h4>
               <ul className="space-y-2.5 text-xs text-slate-500 font-semibold">
                 <li>
@@ -1622,7 +1772,79 @@ export default function App() {
               </ul>
             </div>
 
-            {/* Box 3: Direct contact call cards (Saves 3 cols) */}
+            {/* Box 3: Services par Ville (Saves 3 cols) */}
+            <div className="space-y-4 lg:col-span-3">
+              <h4 className="text-slate-200 text-xs font-black uppercase tracking-wider font-display">Services par Ville</h4>
+              <ul className="space-y-2 text-xs text-slate-500 font-semibold">
+                <li>
+                  <a
+                    href="/"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCurrentPage('accueil');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="hover:text-emerald-400 hover:underline transition block"
+                  >
+                    Débarras Mérignac
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCurrentPage('accueil');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="hover:text-emerald-400 hover:underline transition block"
+                  >
+                    Débarras Pessac
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCurrentPage('accueil');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="hover:text-emerald-400 hover:underline transition block"
+                  >
+                    Débarras Talence
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCurrentPage('accueil');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="hover:text-emerald-400 hover:underline transition block"
+                  >
+                    Débarras Villenave-d'Ornon
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setCurrentPage('accueil');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="hover:text-emerald-400 hover:underline transition block"
+                  >
+                    Débarras Bègles
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Box 4: Direct contact call cards (Saves 3 cols) */}
             <div className="space-y-4 lg:col-span-3">
               <h4 className="text-slate-200 text-xs font-black uppercase tracking-wider font-display">Contact Direct</h4>
               <div className="space-y-2.5 text-xs font-semibold">
@@ -1659,7 +1881,59 @@ export default function App() {
 
           </div>
 
-
+          {/* Section Zones d'Intervention Détaillées pour l'optimisation du maillage local / SEO */}
+          <div className="mt-8 border-t border-slate-800/80 pt-6">
+            <button
+              onClick={() => setIsZonesExpanded(!isZonesExpanded)}
+              className="flex items-center gap-2 text-slate-450 hover:text-slate-200 transition text-[11px] font-extrabold uppercase tracking-wider cursor-pointer"
+            >
+              <span>Zones d'Intervention Détaillées</span>
+              {isZonesExpanded ? <ChevronUp className="w-3.5 h-3.5 text-emerald-400" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-500" />}
+            </button>
+            
+            <AnimatePresence>
+              {isZonesExpanded && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: 'auto' }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  className="overflow-hidden"
+                >
+                  <div className="pt-4 space-y-3.5">
+                    <p className="text-[10px] text-slate-500 leading-relaxed font-semibold">
+                      Damien Pommier intervient rapidement pour vos débarras, déménagements et nettoyages professionnels dans l'ensemble de la métropole bordelaise et de la Gironde (33). Retrouvez ci-dessous la liste détaillée de nos secteurs d'activité :
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-3 gap-y-2 text-[10px] text-slate-400 font-semibold">
+                      {[
+                        "Bordeaux Centre", "Mérignac", "Pessac", "Talence", "Villenave-d'Ornon", 
+                        "Saint-Médard-en-Jalles", "Bègles", "Gradignan", "Cenon", "Libourne", 
+                        "Lormont", "Le Bouscat", "Eysines", "Floirac", "Cestas", "Blanquefort", 
+                        "Bruges", "Ambarès-et-Lagrave", "La Teste-de-Buch", "Gujan-Mestras", 
+                        "Arcachon", "Andernos-les-Bains", "Le Haillan", "Parempuyre", 
+                        "Martignas-sur-Jalle", "Taillan-Médoc", "Saint-Loubès", "Artigues-près-Bordeaux", 
+                        "Carbon-Blanc", "Sainte-Eulalie", "Saint-Jean-d'Illac", "Le Pian-Médoc"
+                      ].map((city) => (
+                        <a
+                          key={city}
+                          href="/"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setCurrentPage('accueil');
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }}
+                          className="hover:text-emerald-400 hover:underline transition-all block py-0.5 truncate"
+                          title={`Service de débarras et déménagement à ${city}`}
+                        >
+                          Débarras {city}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-600 text-[11px] font-semibold">
             <div>
@@ -1667,6 +1941,9 @@ export default function App() {
             </div>
             <div className="flex items-center gap-6">
               <button onClick={() => setActiveModal('legals')} className="hover:text-emerald-400 transition cursor-pointer">Mentions Légales</button>
+              <button onClick={() => setIsDrawerOpen(true)} className="hover:text-emerald-400 transition cursor-pointer flex items-center gap-1.5">
+                <span>⚙️ Configuration de Réception</span>
+              </button>
             </div>
           </div>
 
@@ -1681,6 +1958,21 @@ export default function App() {
           quotes={quotes}
           onDeleteQuote={handleDeleteQuote}
           onRefresh={handleRefreshQuotes}
+          leadDestination={leadDestination}
+          onLeadDestinationChange={(dest) => {
+            setLeadDestination(dest);
+            localStorage.setItem('pommier_lead_destination', dest);
+          }}
+          web3FormsKey={web3FormsKey}
+          onWeb3FormsKeyChange={(key) => {
+            setWeb3FormsKey(key);
+            localStorage.setItem('pommier_web3forms_key', key);
+          }}
+          formspreeEndpoint={formspreeEndpoint}
+          onFormspreeEndpointChange={(endpoint) => {
+            setFormspreeEndpoint(endpoint);
+            localStorage.setItem('pommier_formspree_endpoint', endpoint);
+          }}
         />
       </React.Suspense>
 

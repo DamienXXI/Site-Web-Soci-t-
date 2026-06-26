@@ -9,14 +9,17 @@ import { WASTE_ITEMS } from '../data';
 import {
   X,
   Clock,
-  CheckCircle,
   Truck,
-  PhoneCall,
-  Calendar,
   Sparkles,
   RefreshCw,
   MapPin,
-  Trash2
+  Trash2,
+  Settings,
+  Mail,
+  Shield,
+  Check,
+  ChevronDown,
+  ChevronUp
 } from 'lucide-react';
 
 interface MyRequestsDrawerProps {
@@ -25,6 +28,12 @@ interface MyRequestsDrawerProps {
   quotes: QuoteRequest[];
   onDeleteQuote: (id: string) => void;
   onRefresh: () => void;
+  leadDestination?: 'local' | 'email';
+  onLeadDestinationChange?: (dest: 'local' | 'email') => void;
+  web3FormsKey?: string;
+  onWeb3FormsKeyChange?: (key: string) => void;
+  formspreeEndpoint?: string;
+  onFormspreeEndpointChange?: (endpoint: string) => void;
 }
 
 export default function MyRequestsDrawer({
@@ -32,38 +41,17 @@ export default function MyRequestsDrawer({
   onClose,
   quotes,
   onDeleteQuote,
-  onRefresh
+  onRefresh,
+  leadDestination = 'local',
+  onLeadDestinationChange,
+  web3FormsKey = '',
+  onWeb3FormsKeyChange,
+  formspreeEndpoint = '',
+  onFormspreeEndpointChange
 }: MyRequestsDrawerProps) {
+  const [isAdminExpanded, setIsAdminExpanded] = React.useState(false);
+  
   if (!isOpen) return null;
-
-  // Render a progress stepper based on quote date
-  const getTrackingState = (createdAt: string) => {
-    const elapsedMinutes = Math.floor((Date.now() - new Date(createdAt).getTime()) / 60000);
-    
-    // Virtual SLA steps
-    if (elapsedMinutes < 2) {
-      return {
-        step: 1,
-        title: "Validation automatique en cours",
-        desc: "Mon système calcule le trajet du camion le plus proche.",
-        color: "text-amber-600 bg-amber-50 border-amber-200"
-      };
-    } else if (elapsedMinutes < 8) {
-      return {
-        step: 2,
-        title: "Attribution d'un planificateur local",
-        desc: "Un conseiller technique analyse l'accessibilité de votre logement.",
-        color: "text-emerald-700 bg-emerald-50 border-emerald-100"
-      };
-    } else {
-      return {
-        step: 3,
-        title: "Prise de contact imminente",
-        desc: "Votre interlocuteur dédié va vous appeler sous 5 à 10 minutes.",
-        color: "text-blue-700 bg-blue-50 border-blue-100"
-      };
-    }
-  };
 
   return (
     <div className="fixed inset-0 z-50 overflow-hidden">
@@ -107,6 +95,102 @@ export default function MyRequestsDrawer({
 
           {/* Content Body */}
           <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+            
+            {/* Panneau d'administration de réception des devis */}
+            <div className="border border-emerald-200/60 rounded-3xl bg-emerald-50/40 p-4 space-y-3">
+              <button
+                type="button"
+                onClick={() => setIsAdminExpanded(!isAdminExpanded)}
+                className="w-full flex items-center justify-between font-bold text-xs text-emerald-950 focus:outline-none cursor-pointer"
+              >
+                <span className="flex items-center gap-2">
+                  <Shield className="w-4 h-4 text-emerald-700 shrink-0" />
+                  <span>🛠️ Configuration de Réception</span>
+                </span>
+                {isAdminExpanded ? <ChevronUp className="w-4 h-4 text-emerald-700" /> : <ChevronDown className="w-4 h-4 text-emerald-700" />}
+              </button>
+
+              {isAdminExpanded && (
+                <div className="space-y-3.5 pt-2 border-t border-emerald-100/60 text-slate-700 text-xs font-semibold animate-fade-in">
+                  <p className="text-[10px] text-slate-500 leading-relaxed font-medium">
+                    Configurez où sont envoyées les demandes d'estimations des clients faites depuis les simulateurs :
+                  </p>
+
+                  <div className="space-y-2">
+                    {/* Option 1 */}
+                    <label className="flex items-start gap-2.5 p-2 rounded-xl border border-slate-100 bg-white hover:bg-slate-50/80 transition cursor-pointer">
+                      <input
+                        type="radio"
+                        name="leadDest"
+                        checked={leadDestination === 'local'}
+                        onChange={() => onLeadDestinationChange?.('local')}
+                        className="mt-0.5 text-emerald-600 focus:ring-emerald-500"
+                      />
+                      <div>
+                        <div className="font-bold text-slate-900 text-[10.5px]">Option 1 : Stockage Local</div>
+                        <div className="text-[9.5px] text-slate-400 font-medium leading-tight">Par défaut, pour tester dans ce navigateur (enregistré dans l'onglet "Mes demandes").</div>
+                      </div>
+                    </label>
+
+                    {/* Option 2 */}
+                    <label className="flex items-start gap-2.5 p-2 rounded-xl border border-slate-100 bg-white hover:bg-slate-50/80 transition cursor-pointer">
+                      <input
+                        type="radio"
+                        name="leadDest"
+                        checked={leadDestination === 'email'}
+                        onChange={() => onLeadDestinationChange?.('email')}
+                        className="mt-0.5 text-emerald-600 focus:ring-emerald-500"
+                      />
+                      <div>
+                        <div className="font-bold text-slate-900 text-[10.5px] flex items-center gap-1">
+                          <Mail className="w-3.5 h-3.5 text-emerald-600" /> Option 2 : Envoi direct par E-mail
+                        </div>
+                        <div className="text-[9.5px] text-slate-400 font-medium leading-tight">Reçoit les demandes par e-mail instantanément (Web3Forms/Formspree).</div>
+                      </div>
+                    </label>
+                  </div>
+
+                  {/* Fields for Option 2 */}
+                  {leadDestination === 'email' && (
+                    <div className="p-3 bg-white border border-slate-200/60 rounded-2xl space-y-2.5 shadow-sm">
+                      <div className="text-[10px] font-bold text-slate-800 uppercase tracking-wider">Paramètres de messagerie</div>
+                      
+                      <div className="space-y-1">
+                        <label className="text-[10px] text-slate-400 block font-bold">Clé Web3Forms Access Key :</label>
+                        <input
+                          type="text"
+                          value={web3FormsKey}
+                          onChange={(e) => onWeb3FormsKeyChange?.(e.target.value)}
+                          placeholder="Ex: 8a42bcde-..."
+                          className="w-full p-2 border border-slate-200 rounded-xl text-xs font-mono text-slate-850 focus:outline-none focus:border-emerald-500"
+                        />
+                        <p className="text-[9px] text-slate-400 font-medium leading-tight">
+                          Obtenez une clé gratuite sur <a href="https://web3forms.com" target="_blank" rel="noopener noreferrer" className="text-emerald-600 underline">web3forms.com</a> (recommande un envoi propre sans backend).
+                        </p>
+                      </div>
+
+                      <div className="relative flex py-1 items-center">
+                        <div className="flex-grow border-t border-slate-200/50"></div>
+                        <span className="flex-shrink mx-2 text-[9px] text-slate-400 font-bold uppercase">ou</span>
+                        <div className="flex-grow border-t border-slate-200/50"></div>
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="text-[10px] text-slate-400 block font-bold">Endpoint URL Formspree (alternative) :</label>
+                        <input
+                          type="text"
+                          value={formspreeEndpoint}
+                          onChange={(e) => onFormspreeEndpointChange?.(e.target.value)}
+                          placeholder="Ex: https://formspree.io/f/mqkvp..."
+                          className="w-full p-2 border border-slate-200 rounded-xl text-xs font-mono text-slate-850 focus:outline-none focus:border-emerald-500"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             {quotes.length === 0 ? (
               <div className="text-center py-16 px-4 space-y-4">
                 <div className="w-16 h-16 bg-white/60 text-slate-400 border border-dashed border-slate-200/80 rounded-full flex items-center justify-center mx-auto">
@@ -137,7 +221,6 @@ export default function MyRequestsDrawer({
 
                 <div className="space-y-4">
                   {quotes.map(quote => {
-                    const tracking = getTrackingState(quote.createdAt);
                     const selectedItems = Object.entries(quote.selectedItems).filter(([_, qty]) => qty > 0);
 
                     return (
@@ -159,13 +242,13 @@ export default function MyRequestsDrawer({
                           </button>
                         </div>
 
-                        {/* Tracker status banner */}
-                        <div className={`p-3 rounded-2xl border text-xs leading-relaxed font-semibold shadow-sm ${tracking.color}`}>
-                          <div className="font-extrabold flex items-center gap-1.5 mb-0.5">
-                            <span className="inline-block w-2.5 h-2.5 rounded-full bg-current animate-pulse shrink-0"></span>
-                            {tracking.title}
-                          </div>
-                          <p className="font-semibold opacity-90 text-[11px]">{tracking.desc}</p>
+                        {/* Demande enregistrée */}
+                        <div className="p-3 rounded-2xl border border-emerald-100 bg-emerald-50/50 text-xs leading-relaxed font-semibold text-emerald-950 shadow-sm">
+                          <span className="font-extrabold flex items-center gap-1.5 text-emerald-800">
+                            <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse shrink-0"></span>
+                            Demande enregistrée
+                          </span>
+                          <p className="opacity-95 text-slate-500 text-[11px] mt-0.5 font-medium">Damien Pommier étudiera votre projet très rapidement.</p>
                         </div>
 
                         {/* Quote summary details */}
@@ -197,22 +280,6 @@ export default function MyRequestsDrawer({
                             </div>
                           </div>
                         )}
-
-                        {/* Tracking workflow UI icons */}
-                        <div className="grid grid-cols-3 gap-1.5 pt-2 border-t border-slate-200/50 text-[10px] font-bold text-center mt-2">
-                          <div className="flex flex-col items-center gap-1 text-emerald-600">
-                            <CheckCircle className="w-4 h-4 stroke-[2.5]" />
-                            <span>1. Chiffré</span>
-                          </div>
-                          <div className={`flex flex-col items-center gap-1 ${tracking.step >= 2 ? 'text-emerald-500' : 'text-slate-300'}`}>
-                            <PhoneCall className="w-4 h-4 stroke-[2]" />
-                            <span>2. Entretien</span>
-                          </div>
-                          <div className={`flex flex-col items-center gap-1 ${tracking.step >= 3 ? 'text-emerald-500' : 'text-slate-300'}`}>
-                            <Calendar className="w-4 h-4 stroke-[2]" />
-                            <span>3. Planifié</span>
-                          </div>
-                        </div>
 
                       </div>
                     );

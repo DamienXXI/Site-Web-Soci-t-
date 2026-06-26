@@ -188,7 +188,7 @@ export default function AutresPrestations({ onQuoteSubmitted }: AutresPrestation
     }
 
     const newQuote: QuoteRequest = {
-      id: 'quote-ap-' + Date.now(),
+      id: 'Devis-2026' + Math.floor(1000 + Math.random() * 9000),
       fullName,
       email,
       phone,
@@ -201,6 +201,7 @@ export default function AutresPrestations({ onQuoteSubmitted }: AutresPrestation
       hasElevator: false,
       parkingDistance: 'proche',
       additionalDetails: `[Service Spécial: ${servicesList.find(s => s.id === selectedService)?.title}] ${configDetails}. Estimation: ${pricingSimulation.ourPrice}€ HT. Détails additionnels: ${details}`,
+      estimatedPrice: `${pricingSimulation.ourPrice} € HT`,
       createdAt: new Date().toISOString(),
       status: 'pending'
     };

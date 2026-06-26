@@ -6,6 +6,7 @@
 import React, { useState, useMemo } from 'react';
 import { CATEGORIES, WASTE_ITEMS, calculateEstimatedPrice } from '../data';
 import { QuoteRequest } from '../types';
+import { compressImage } from '../utils';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Sofa,
@@ -119,15 +120,26 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
     setPhotoFiles((prev) => [...prev, newPhoto]);
 
     const reader = new FileReader();
-    reader.onloadend = () => {
+    reader.onloadend = async () => {
       if (typeof reader.result === 'string') {
-        const dataUrl = reader.result;
-        setPhotoFiles((prev) =>
-          prev.map((item) =>
-            item.id === id ? { ...item, dataUrl, status: 'success' } : item
-          )
-        );
-        setPhotos((prev) => [...prev, dataUrl]);
+        const originalDataUrl = reader.result;
+        try {
+          const compressedDataUrl = await compressImage(originalDataUrl);
+          setPhotoFiles((prev) =>
+            prev.map((item) =>
+              item.id === id ? { ...item, dataUrl: compressedDataUrl, status: 'success' } : item
+            )
+          );
+          setPhotos((prev) => [...prev, compressedDataUrl]);
+        } catch (e) {
+          console.error("Compression failed, using original:", e);
+          setPhotoFiles((prev) =>
+            prev.map((item) =>
+              item.id === id ? { ...item, dataUrl: originalDataUrl, status: 'success' } : item
+            )
+          );
+          setPhotos((prev) => [...prev, originalDataUrl]);
+        }
       } else {
         setPhotoFiles((prev) =>
           prev.map((item) =>
@@ -280,7 +292,7 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
     // Simulate reliable API call to process quote within 2hr SLA
     setTimeout(() => {
       const newQuote: QuoteRequest = {
-        id: 'DEB-' + Math.floor(Math.random() * 900000 + 100000),
+        id: 'Devis-2026' + Math.floor(1000 + Math.random() * 9000),
         fullName,
         email,
         phone,
@@ -294,6 +306,7 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
         hasElevator,
         parkingDistance,
         additionalDetails,
+        estimatedPrice: `${priceRange.min} € HT`,
         photos,
         createdAt: new Date().toISOString(),
         status: 'pending'

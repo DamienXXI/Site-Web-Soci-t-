@@ -16,6 +16,7 @@ import {
   X
 } from 'lucide-react';
 import { QuoteRequest } from '../types';
+import { compressImage } from '../utils';
 
 interface DemenagementCalculatorProps {
   onQuoteSubmitted: (newQuote: QuoteRequest) => void;
@@ -91,9 +92,16 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
       const filesArray: File[] = Array.from(e.target.files);
       filesArray.forEach((file) => {
         const reader = new FileReader();
-        reader.onloadend = () => {
+        reader.onloadend = async () => {
           if (typeof reader.result === 'string') {
-            setDemPhotos((prev) => [...prev, reader.result as string]);
+            const originalDataUrl = reader.result;
+            try {
+              const compressedDataUrl = await compressImage(originalDataUrl);
+              setDemPhotos((prev) => [...prev, compressedDataUrl]);
+            } catch (err) {
+              console.error("Compression failed:", err);
+              setDemPhotos((prev) => [...prev, originalDataUrl]);
+            }
           }
         };
         reader.readAsDataURL(file);
@@ -122,9 +130,16 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
       filesArray.forEach((file) => {
         if (file.type.startsWith('image/')) {
           const reader = new FileReader();
-          reader.onloadend = () => {
+          reader.onloadend = async () => {
             if (typeof reader.result === 'string') {
-              setDemPhotos((prev) => [...prev, reader.result as string]);
+              const originalDataUrl = reader.result;
+              try {
+                const compressedDataUrl = await compressImage(originalDataUrl);
+                setDemPhotos((prev) => [...prev, compressedDataUrl]);
+              } catch (err) {
+                console.error("Compression failed:", err);
+                setDemPhotos((prev) => [...prev, originalDataUrl]);
+              }
             }
           };
           reader.readAsDataURL(file);
@@ -1088,7 +1103,7 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                   `Détails additionnels : ${demMessage}`;
 
                 const newQuote: QuoteRequest = {
-                  id: 'DEM-' + Math.floor(Math.random() * 900000 + 100000),
+                  id: 'Devis-2026' + Math.floor(1000 + Math.random() * 9000),
                   fullName: demName,
                   email: demEmail,
                   phone: demPhone,
@@ -1112,6 +1127,7 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                   hasElevator: true,
                   parkingDistance: 'proche',
                   additionalDetails: detailText,
+                  estimatedPrice: `${totalEstimatedPrice.toFixed(2)} € TTC`,
                   photos: demPhotos,
                   createdAt: new Date().toISOString(),
                   status: 'pending'
