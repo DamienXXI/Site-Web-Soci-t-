@@ -6,6 +6,7 @@
 import React, { useState, useMemo } from 'react';
 import { CATEGORIES, WASTE_ITEMS, calculateEstimatedPrice } from '../data';
 import { QuoteRequest } from '../types';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   Sofa,
   Tv,
@@ -22,11 +23,22 @@ import {
   Minus,
   Check,
   RotateCcw,
-  Info
+  Info,
+  Upload,
+  X,
+  Image as ImageIcon
 } from 'lucide-react';
 
 interface VolumeCalculatorProps {
   onQuoteSubmitted: (quote: QuoteRequest) => void;
+}
+
+interface PhotoFile {
+  id: string;
+  name: string;
+  size: string;
+  dataUrl: string;
+  status: 'loading' | 'success' | 'error';
 }
 
 export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorProps) {
@@ -87,6 +99,86 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
   const [hasElevator, setHasElevator] = useState<boolean>(false);
   const [parkingDistance, setParkingDistance] = useState<'proche' | 'moyen' | 'eloigne'>('proche');
   const [additionalDetails, setAdditionalDetails] = useState('');
+  const [photos, setPhotos] = useState<string[]>([]);
+  const [photoFiles, setPhotoFiles] = useState<PhotoFile[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const processFile = (file: File) => {
+    const id = Math.random().toString(36).substring(2, 9);
+    const sizeStr = (file.size / (1024 * 1024)).toFixed(2) + ' Mo';
+    
+    // Add loading state
+    const newPhoto: PhotoFile = {
+      id,
+      name: file.name,
+      size: sizeStr,
+      dataUrl: '',
+      status: 'loading'
+    };
+    
+    setPhotoFiles((prev) => [...prev, newPhoto]);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      if (typeof reader.result === 'string') {
+        const dataUrl = reader.result;
+        setPhotoFiles((prev) =>
+          prev.map((item) =>
+            item.id === id ? { ...item, dataUrl, status: 'success' } : item
+          )
+        );
+        setPhotos((prev) => [...prev, dataUrl]);
+      } else {
+        setPhotoFiles((prev) =>
+          prev.map((item) =>
+            item.id === id ? { ...item, status: 'error' } : item
+          )
+        );
+      }
+    };
+    reader.onerror = () => {
+      setPhotoFiles((prev) =>
+        prev.map((item) =>
+          item.id === id ? { ...item, status: 'error' } : item
+        )
+      );
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArray: File[] = Array.from(e.target.files);
+      filesArray.forEach(processFile);
+    }
+  };
+
+  const handleRemovePhoto = (id: string, dataUrl: string) => {
+    setPhotoFiles((prev) => prev.filter((item) => item.id !== id));
+    setPhotos((prev) => prev.filter((url) => url !== dataUrl));
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = () => {
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    if (e.dataTransfer.files) {
+      const filesArray: File[] = Array.from(e.dataTransfer.files);
+      filesArray.forEach((file) => {
+        if (file.type.startsWith('image/')) {
+          processFile(file);
+        }
+      });
+    }
+  };
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -202,6 +294,7 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
         hasElevator,
         parkingDistance,
         additionalDetails,
+        photos,
         createdAt: new Date().toISOString(),
         status: 'pending'
       };
@@ -232,6 +325,7 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
     setHasElevator(false);
     setParkingDistance('proche');
     setAdditionalDetails('');
+    setPhotos([]);
   };
 
   return (
@@ -448,6 +542,10 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
                 </div>
               )}
             </div>
+            
+            <p className="text-[10px] text-slate-500 leading-normal text-right font-sans font-semibold -mt-3 mb-2 px-2">
+              Le devis final sera validé par Damien après examen logistique.
+            </p>
 
             {/* Interactive Contact & Location form */}
             <div className="bg-white/50 backdrop-blur-sm rounded-3xl p-6 border border-white/60 space-y-4 shadow-sm">
@@ -650,6 +748,124 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
                     placeholder="Objets fragiles, piano, syndrome de Diogène, horaires particuliers, recyclage informatique..."
                     className="w-full bg-white/60 border border-slate-200/50 rounded-xl p-2.5 text-xs font-semibold focus:bg-white/95 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:outline-none resize-none transition"
                   ></textarea>
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="block text-xs font-bold text-slate-700">
+                      Photos des objets (conseillé pour un devis précis)
+                    </label>
+                    {photoFiles.length > 0 && (
+                      <span className="text-[10px] text-emerald-600 font-extrabold font-mono">
+                        {photoFiles.length} photo{photoFiles.length > 1 ? 's' : ''} sélectionnée{photoFiles.length > 1 ? 's' : ''}
+                      </span>
+                    )}
+                  </div>
+                  
+                  <motion.div
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                    onDrop={handleDrop}
+                    animate={{ scale: isDragging ? 1.015 : 1 }}
+                    className={`border-2 border-dashed rounded-2xl p-5 text-center cursor-pointer transition-all duration-200 relative overflow-hidden ${
+                      isDragging
+                        ? 'border-emerald-500 bg-emerald-50/30 ring-4 ring-emerald-500/10'
+                        : 'border-slate-250 bg-slate-50/40 hover:border-emerald-500 hover:bg-slate-50/80 shadow-inner'
+                    }`}
+                  >
+                    <input
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handlePhotoUpload}
+                      className="hidden"
+                      id="volume-photo-upload"
+                    />
+                    <label htmlFor="volume-photo-upload" className="cursor-pointer block">
+                      <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center mx-auto mb-2 shadow-sm">
+                        <Upload className="w-5 h-5 text-emerald-600" />
+                      </div>
+                      <p className="text-xs font-bold text-slate-700">
+                        Glissez vos photos ici ou <span className="text-emerald-600 hover:text-emerald-700 underline font-extrabold">parcourez vos fichiers</span>
+                      </p>
+                      <p className="text-[10px] text-slate-400 mt-1 font-medium font-sans">
+                        Formats acceptés : JPG, PNG, WEBP &bull; Max 5 Mo par photo
+                      </p>
+                      <p className="text-[9px] text-emerald-600/80 mt-1.5 font-bold uppercase tracking-wider bg-emerald-50 border border-emerald-100/50 rounded-md py-0.5 px-2 inline-block">
+                        ⚡ Les photos aident Damien à fixer un prix définitif sans visite !
+                      </p>
+                    </label>
+                  </motion.div>
+
+                  {/* Enhanced Previews with List & Thumbnails */}
+                  <AnimatePresence>
+                    {photoFiles.length > 0 && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="mt-4 space-y-2.5"
+                      >
+                        {/* Summary bar */}
+                        <div className="flex items-center justify-between text-[11px] bg-slate-100/80 border border-slate-200/50 rounded-xl px-3 py-1.5">
+                          <span className="font-bold text-slate-600 flex items-center gap-1.5">
+                            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                            Espace d'envoi optimisé (Prêt)
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => { setPhotoFiles([]); setPhotos([]); }}
+                            className="text-red-500 hover:text-red-700 font-extrabold uppercase text-[9px] tracking-wider cursor-pointer"
+                          >
+                            Tout effacer
+                          </button>
+                        </div>
+
+                        {/* Interactive Grid with Details */}
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          {photoFiles.map((p) => (
+                            <motion.div
+                              key={p.id}
+                              initial={{ opacity: 0, y: 10 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              exit={{ opacity: 0, scale: 0.9 }}
+                              className="bg-white/95 border border-slate-150 rounded-xl p-2 flex items-center gap-3 shadow-xs hover:border-emerald-300 transition-colors group relative"
+                            >
+                              <div className="w-12 h-12 rounded-lg overflow-hidden border border-slate-200/60 flex-shrink-0 bg-slate-50">
+                                {p.status === 'loading' ? (
+                                  <div className="w-full h-full flex items-center justify-center bg-slate-100">
+                                    <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
+                                  </div>
+                                ) : (
+                                  <img src={p.dataUrl} alt={p.name} className="w-full h-full object-cover" />
+                                )}
+                              </div>
+                              
+                              <div className="flex-1 min-w-0 pr-6">
+                                <p className="text-[11px] font-bold text-slate-800 truncate font-sans">{p.name}</p>
+                                <p className="text-[10px] text-slate-450 font-medium font-mono">{p.size}</p>
+                              </div>
+
+                              {p.status === 'success' && (
+                                <span className="absolute right-9 top-[50%] -translate-y-[50%] text-emerald-500 font-bold text-xs bg-emerald-50 p-1 rounded-full border border-emerald-100">
+                                  ✓
+                                </span>
+                              )}
+
+                              <button
+                                type="button"
+                                onClick={() => handleRemovePhoto(p.id, p.dataUrl)}
+                                className="absolute right-2 top-[50%] -translate-y-[50%] p-1.5 text-slate-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition cursor-pointer"
+                                title="Supprimer la photo"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </motion.div>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
                 <button

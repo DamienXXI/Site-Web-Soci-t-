@@ -33,6 +33,7 @@ export interface QuoteRequest {
   hasElevator: boolean;
   parkingDistance: 'proche' | 'moyen' | 'eloigne';
   additionalDetails?: string;
+  photos?: string[];
   createdAt: string;
   status: 'pending' | 'reviewed' | 'scheduled';
 }

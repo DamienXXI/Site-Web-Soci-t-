@@ -131,7 +131,7 @@ export default function MyRequestsDrawer({
                 <div className="p-3 bg-emerald-50/60 backdrop-blur-sm text-emerald-900 rounded-2xl text-xs flex gap-2 leading-relaxed border border-emerald-100/50 font-semibold">
                   <Sparkles className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600 animate-pulse" />
                   <span>
-                    <strong>SLA Prioritaire :</strong> Mes équipes régionales étudient vos volumes en m³ en continu. Conservez cette page ouverte, les statuts s'actualisent.
+                    <strong>Estimation indicative :</strong> Ce devis n'est qu'estimatif et indicatif. Il sera étudié, ajusté et validé de manière définitive par Damien avec modification s'il y a lieu.
                   </span>
                 </div>
 

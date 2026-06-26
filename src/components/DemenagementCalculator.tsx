@@ -9,7 +9,11 @@ import {
   Calculator,
   Building,
   Info,
-  Loader2
+  Loader2,
+  Upload,
+  Camera,
+  Image,
+  X
 } from 'lucide-react';
 import { QuoteRequest } from '../types';
 
@@ -76,8 +80,58 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
     }
   });
   const [demDate, setDemDate] = useState('');
+  const [demDuration, setDemDuration] = useState('1');
   const [demMessage, setDemMessage] = useState('');
   const [demIsSuccess, setDemIsSuccess] = useState(false);
+  const [demPhotos, setDemPhotos] = useState<string[]>([]);
+  const [demIsDragging, setDemIsDragging] = useState(false);
+
+  const handleDemPhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArray: File[] = Array.from(e.target.files);
+      filesArray.forEach((file) => {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          if (typeof reader.result === 'string') {
+            setDemPhotos((prev) => [...prev, reader.result as string]);
+          }
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+  };
+
+  const handleDemRemovePhoto = (index: number) => {
+    setDemPhotos((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const handleDemDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDemIsDragging(true);
+  };
+
+  const handleDemDragLeave = () => {
+    setDemIsDragging(false);
+  };
+
+  const handleDemDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDemIsDragging(false);
+    if (e.dataTransfer.files) {
+      const filesArray: File[] = Array.from(e.dataTransfer.files);
+      filesArray.forEach((file) => {
+        if (file.type.startsWith('image/')) {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            if (typeof reader.result === 'string') {
+              setDemPhotos((prev) => [...prev, reader.result as string]);
+            }
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+    }
+  };
 
   // Calcul automatique du trajet à partir des adresses saisies
   useEffect(() => {
@@ -389,7 +443,13 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                 >
                   -5
                 </button>
-                <span className="font-display font-black text-xs text-slate-900 w-6 text-center">{demCartons}</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={demCartons}
+                  onChange={(e) => setDemCartons(Math.max(0, parseInt(e.target.value) || 0))}
+                  className="font-display font-black text-xs text-slate-900 w-12 text-center bg-slate-50 border border-slate-200 rounded-md py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
                 <button
                   type="button"
                   onClick={() => setDemCartons(demCartons + 5)}
@@ -417,7 +477,13 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                 >
                   -
                 </button>
-                <span className="font-display font-black text-xs text-slate-900 w-6 text-center">{demMeubles}</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={demMeubles}
+                  onChange={(e) => setDemMeubles(Math.max(0, parseInt(e.target.value) || 0))}
+                  className="font-display font-black text-xs text-slate-900 w-12 text-center bg-slate-50 border border-slate-200 rounded-md py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
                 <button
                   type="button"
                   onClick={() => setDemMeubles(demMeubles + 1)}
@@ -445,7 +511,13 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                 >
                   -
                 </button>
-                <span className="font-display font-black text-xs text-slate-900 w-6 text-center">{demElectro}</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={demElectro}
+                  onChange={(e) => setDemElectro(Math.max(0, parseInt(e.target.value) || 0))}
+                  className="font-display font-black text-xs text-slate-900 w-12 text-center bg-slate-50 border border-slate-200 rounded-md py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
                 <button
                   type="button"
                   onClick={() => setDemElectro(demElectro + 1)}
@@ -473,7 +545,13 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                 >
                   -
                 </button>
-                <span className="font-display font-black text-xs text-slate-900 w-6 text-center">{demLits}</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={demLits}
+                  onChange={(e) => setDemLits(Math.max(0, parseInt(e.target.value) || 0))}
+                  className="font-display font-black text-xs text-slate-900 w-12 text-center bg-slate-50 border border-slate-200 rounded-md py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
                 <button
                   type="button"
                   onClick={() => setDemLits(demLits + 1)}
@@ -501,7 +579,13 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                 >
                   -
                 </button>
-                <span className="font-display font-black text-xs text-slate-900 w-6 text-center">{demTables}</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={demTables}
+                  onChange={(e) => setDemTables(Math.max(0, parseInt(e.target.value) || 0))}
+                  className="font-display font-black text-xs text-slate-900 w-12 text-center bg-slate-50 border border-slate-200 rounded-md py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
                 <button
                   type="button"
                   onClick={() => setDemTables(demTables + 1)}
@@ -529,7 +613,13 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                 >
                   -
                 </button>
-                <span className="font-display font-black text-xs text-slate-900 w-6 text-center">{demPetits}</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={demPetits}
+                  onChange={(e) => setDemPetits(Math.max(0, parseInt(e.target.value) || 0))}
+                  className="font-display font-black text-xs text-slate-900 w-12 text-center bg-slate-50 border border-slate-200 rounded-md py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
                 <button
                   type="button"
                   onClick={() => setDemPetits(demPetits + 1)}
@@ -557,7 +647,13 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                 >
                   -
                 </button>
-                <span className="font-display font-black text-xs text-slate-900 w-6 text-center">{demVelos}</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={demVelos}
+                  onChange={(e) => setDemVelos(Math.max(0, parseInt(e.target.value) || 0))}
+                  className="font-display font-black text-xs text-slate-900 w-12 text-center bg-slate-50 border border-slate-200 rounded-md py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
                 <button
                   type="button"
                   onClick={() => setDemVelos(demVelos + 1)}
@@ -585,7 +681,13 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                 >
                   -
                 </button>
-                <span className="font-display font-black text-xs text-slate-900 w-6 text-center">{demDivers}</span>
+                <input
+                  type="number"
+                  min="0"
+                  value={demDivers}
+                  onChange={(e) => setDemDivers(Math.max(0, parseInt(e.target.value) || 0))}
+                  className="font-display font-black text-xs text-slate-900 w-12 text-center bg-slate-50 border border-slate-200 rounded-md py-0.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                />
                 <button
                   type="button"
                   onClick={() => setDemDivers(demDivers + 1)}
@@ -636,7 +738,13 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                   >
                     -
                   </button>
-                  <span className="font-bold text-xs text-slate-900 w-8 text-center">{custQty}</span>
+                  <input
+                    type="number"
+                    min="1"
+                    value={custQty}
+                    onChange={(e) => setCustQty(Math.max(1, parseInt(e.target.value) || 1))}
+                    className="font-bold text-xs text-slate-900 w-12 text-center bg-white border border-slate-200 rounded-lg py-1.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                  />
                   <button
                     type="button"
                     onClick={() => setCustQty(custQty + 1)}
@@ -973,7 +1081,8 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                   : '';
                 
                 const etapesStr = demEtapes.filter(Boolean).length > 0 ? ` [via ${demEtapes.filter(Boolean).join(', ')}]` : '';
-                const detailText = `🚚 Projet Déménagement de ${demDepart}${etapesStr} à ${demArrivee} (${demDistance} km). ` +
+                const durationStr = `${demDuration} jour${Number(demDuration) > 1 ? 's' : ''}`;
+                const detailText = `🚚 Projet Déménagement de ${demDepart}${etapesStr} à ${demArrivee} (${demDistance} km) prévu pour durer ${durationStr}. ` +
                   `Volume : ${parseFloat(totalM3Value.toFixed(3))} m³ (${demCartons} cartons, ${demMeubles} meubles, ${demElectro} appareils, ${demLits} lits, ${demTables} tables, ${demPetits} petits meubles, ${demVelos} vélos, ${demDivers} divers${customItemsStr}). ` +
                   `Prix Estimé : ${totalEstimatedPrice.toFixed(2)}€ TTC. ` +
                   `Détails additionnels : ${demMessage}`;
@@ -1003,11 +1112,13 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                   hasElevator: true,
                   parkingDistance: 'proche',
                   additionalDetails: detailText,
+                  photos: demPhotos,
                   createdAt: new Date().toISOString(),
                   status: 'pending'
                 };
 
                 onQuoteSubmitted(newQuote);
+                setDemPhotos([]);
                 setDemIsSuccess(true);
               }}
               className="space-y-3"
@@ -1067,14 +1178,28 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                 </div>
               </div>
 
-              <div>
-                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Date prévue du déménagement</label>
-                <input
-                  type="date"
-                  value={demDate}
-                  onChange={(e) => setDemDate(e.target.value)}
-                  className="w-full bg-white border border-slate-200/80 rounded-xl py-2 px-3 text-xs focus:ring-1 focus:ring-emerald-500 font-medium font-sans text-slate-850"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Date prévue du déménagement</label>
+                  <input
+                    type="date"
+                    value={demDate}
+                    onChange={(e) => setDemDate(e.target.value)}
+                    className="w-full bg-white border border-slate-200/80 rounded-xl py-2 px-3 text-xs focus:ring-1 focus:ring-emerald-500 font-medium font-sans text-slate-850"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Combien de jours cela va durer ?</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="90"
+                    value={demDuration}
+                    onChange={(e) => setDemDuration(Math.max(1, parseInt(e.target.value) || 1).toString())}
+                    className="w-full bg-white border border-slate-200/80 rounded-xl py-2 px-3 text-xs focus:ring-1 focus:ring-emerald-500 font-medium font-sans text-slate-850"
+                    placeholder="Ex: 1"
+                  />
+                </div>
               </div>
 
               <div>
@@ -1086,6 +1211,55 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                   className="w-full bg-white border border-slate-200/80 rounded-xl py-2 px-3 text-xs focus:ring-1 focus:ring-emerald-500 font-medium text-slate-850"
                   placeholder="ex: Présence d'un ascenseur, étages..."
                 ></textarea>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">
+                  Photos du mobilier / logement (facultatif)
+                </label>
+                <div
+                  onDragOver={handleDemDragOver}
+                  onDragLeave={handleDemDragLeave}
+                  onDrop={handleDemDrop}
+                  className={`border-2 border-dashed rounded-xl p-4 text-center cursor-pointer transition ${
+                    demIsDragging
+                      ? 'border-emerald-500 bg-emerald-50/20'
+                      : 'border-slate-200 hover:border-emerald-500 hover:bg-slate-50/30'
+                  }`}
+                >
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*"
+                    onChange={handleDemPhotoUpload}
+                    className="hidden"
+                    id="dem-photo-upload"
+                  />
+                  <label htmlFor="dem-photo-upload" className="cursor-pointer block">
+                    <Upload className="w-5 h-5 text-slate-400 mx-auto mb-1" />
+                    <p className="text-[11px] font-bold text-slate-600">
+                      Glissez vos photos ici ou <span className="text-emerald-600 hover:text-emerald-700 underline">parcourez vos fichiers</span>
+                    </p>
+                    <p className="text-[9px] text-slate-400 mt-0.5 font-medium font-sans">Formats acceptés : JPG, PNG, WEBP (max 5 Mo)</p>
+                  </label>
+                </div>
+
+                {demPhotos.length > 0 && (
+                  <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 mt-2">
+                    {demPhotos.map((photo, index) => (
+                      <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-slate-150 bg-slate-50 shadow-xs">
+                        <img src={photo} alt={`Aperçu ${index + 1}`} className="w-full h-full object-cover" />
+                        <button
+                          type="button"
+                          onClick={() => handleDemRemovePhoto(index)}
+                          className="absolute top-1 right-1 bg-red-600 text-white rounded-full p-0.5 hover:bg-red-700 transition shadow-sm cursor-pointer"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <button

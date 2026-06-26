@@ -222,7 +222,7 @@ export default function NettoyageCalculator({ onQuoteRequest }: NettoyageCalcula
               <span className="text-[10px] text-slate-500 italic font-bold">HT</span>
             </div>
             <p className="text-[10px] text-slate-400 mt-1 italic leading-relaxed font-medium font-sans">
-              *Une visite d'évaluation physique ou par photos est toujours effectuée avant validation définitive du devis.
+              *Une visite d'évaluation physique ou par photos est toujours effectuée avant validation définitive du devis. Le devis final sera validé par Damien après examen logistique.
             </p>
           </div>
 

@@ -291,6 +291,9 @@ export default function PartiesCommunesCalculator({ onQuoteRequest }: PartiesCom
             <p className="text-[10px] text-slate-400 mt-1 italic leading-relaxed font-semibold">
               Soit environ <strong className="text-slate-200">{(totalPartiesPrice / partiesLots).toFixed(1)} €</strong> par lot/mois pour chaque copropriétaire.
             </p>
+            <p className="text-[10px] text-slate-400 mt-1.5 font-medium font-sans">
+              Le devis final sera validé par Damien après examen logistique.
+            </p>
           </div>
 
           {/* Quick Specs */}
@@ -304,14 +307,14 @@ export default function PartiesCommunesCalculator({ onQuoteRequest }: PartiesCom
             <div className="space-y-1">
               <span className="text-slate-400 block font-bold">⏱️ Contrôle Qualité :</span>
               <span className="font-extrabold text-sm text-emerald-400 font-mono">Carnet Émargé</span>
-              <span className="text-[9px] text-slate-550 block font-sans">Fiche visible au hall</span>
+              <span className="text-[9px] text-slate-500 block font-sans">Fiche visible au hall</span>
             </div>
           </div>
 
           {/* Included tasks */}
           <div className="space-y-2">
             <span className="text-[11px] font-extrabold text-emerald-400 uppercase tracking-widest block">Inclus dans la formule :</span>
-            <ul className="text-[11px] text-slate-350 space-y-1.5 font-sans font-semibold mb-2">
+            <ul className="text-[11px] text-slate-400 space-y-1.5 font-sans font-semibold mb-2">
               <li className="flex items-center gap-1.5">✓ Balayage & lavage du hall d'entrée</li>
               <li className="flex items-center gap-1.5">✓ Aspiration + lessivage de l'escalier</li>
               <li className="flex items-center gap-1.5">✓ Vidage des corbeilles à prospectus</li>
