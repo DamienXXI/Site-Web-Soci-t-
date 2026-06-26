@@ -587,6 +587,28 @@ export default function InterventionZoneMap() {
           </div>
         </div>
 
+        {/* Villes desservies dans un rayon de 50km pour le référencement (SEO) */}
+        <div className="mt-12 bg-slate-900/15 border border-slate-800/40 p-6 md:p-8 rounded-3xl space-y-4 text-left">
+          <div className="flex items-center gap-2 pb-2 border-b border-slate-800/60">
+            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse" />
+            <h3 className="text-xs font-extrabold uppercase tracking-widest text-emerald-400 font-sans">
+              📍 Villes desservies en Gironde (Rayon de 50 km autour de Bordeaux)
+            </h3>
+          </div>
+          <p className="text-[11px] text-slate-400 font-medium leading-relaxed font-sans">
+            Nous intervenons rapidement sous 24h à 48h pour vos besoins de débarras, nettoyage extrême, syndrome de Diogène, et aide au déménagement dans l'ensemble des communes de la métropole bordelaise et de la Gironde (33) :
+          </p>
+          <div className="flex flex-wrap gap-1.5 text-[10px] text-slate-300 font-sans font-bold">
+            {[
+              "Bordeaux", "Mérignac", "Pessac", "Talence", "Villenave-d'Ornon", "Saint-Médard-en-Jalles", "Bègles", "Cenon", "Gradignan", "Lormont", "Eysines", "Cestas", "Floirac", "Blanquefort", "Bruges", "Ambarès-et-Lagrave", "Le Bouscat", "Léognan", "Saint-André-de-Cubzac", "Libourne", "Gujan-Mestras", "Castelnau-de-Médoc", "Créon", "Saint-Jean-d'Illac", "Martignas-sur-Jalle", "Canéjan", "Carbon-Blanc", "Bassens", "Saint-Loubès", "Artigues-près-Bordeaux", "Parempuyre", "Le Taillan-Médoc", "Saint-Aubin-de-Médoc", "Ludon-Médoc", "Macau", "Langon", "Cadillac", "Podensac", "Portets", "Saint-Sulpice-et-Cameyrac", "Bouliac", "Latresne", "Fargues-Saint-Hilaire", "Sadirac", "Carignan-de-Bordeaux", "Blaye", "Saint-Émilion", "Izon", "Saint-Denis-de-Pile", "Coutras", "Biganos", "Audenge", "Lanton", "Andernos-les-Bains", "Marcheprime", "Salles", "Belin-Béliet", "Saint-Selve", "La Brède", "Martillac", "Beautiran", "Castres-Gironde", "Arsac", "Pian-Médoc", "Saucats", "Le Barp", "Tresses", "Yvrac", "Cénac", "Camblanes-et-Meynac", "Quinsac", "Saint-Caprais-de-Bordeaux", "Lignan-de-Bordeaux", "Sainte-Eulalie", "Montussan", "Beychac-et-Caillau", "Vayres", "Arveyres", "Fronsac", "Saint-Germain-du-Puch", "Baron", "Nérigean"
+            ].map((city, cIdx) => (
+              <span key={cIdx} className="px-2.5 py-1 bg-slate-950/50 border border-slate-800 rounded-lg hover:border-emerald-500/40 hover:text-white transition duration-150">
+                {city}
+              </span>
+            ))}
+          </div>
+        </div>
+
       </div>
     </section>
   );

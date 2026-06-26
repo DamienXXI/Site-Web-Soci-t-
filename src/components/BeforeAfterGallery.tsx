@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Sparkles, ArrowLeftRight, HelpCircle } from 'lucide-react';
+import { Sparkles, ArrowLeftRight, HelpCircle, MapPin } from 'lucide-react';
 
 // Use generated local images for the débarras scenario
 // @ts-ignore
@@ -24,6 +24,7 @@ interface Scenario {
   beforeImg: string;
   afterImg: string;
   category: 'debarras' | 'nettoyage' | 'demenagement';
+  city: string;
   disabled?: boolean;
   statusText?: string;
 }
@@ -36,7 +37,8 @@ const scenarios: Scenario[] = [
     description: "Évacuation rapide d'encombrants, cartons de mobilier volumineux et emballages abandonnés encombrant les passages dans les couloirs d'immeubles ou de résidences.",
     beforeImg: corridorBefore,
     afterImg: corridorAfter,
-    category: 'debarras'
+    category: 'debarras',
+    city: "Bordeaux (33000)"
   },
   {
     id: 'technical',
@@ -45,7 +47,8 @@ const scenarios: Scenario[] = [
     description: "Retrait sécurisé d'archives humides, cartons usagés, vieux textiles accumulés et détritus stockés illégalement dans un placard de compteurs d'immeuble.",
     beforeImg: technicalBefore,
     afterImg: technicalAfter,
-    category: 'debarras'
+    category: 'debarras',
+    city: "Mérignac (33700)"
   },
   {
     id: 'debarras',
@@ -54,7 +57,8 @@ const scenarios: Scenario[] = [
     description: "Enlèvement complet des encombrants, tri méticuleux pour don et recyclage, suivi d'un balayage soigné.",
     beforeImg: debarrasBefore,
     afterImg: debarrasAfter,
-    category: 'debarras'
+    category: 'debarras',
+    city: "Pessac (33600)"
   },
   {
     id: 'demenagement',
@@ -63,7 +67,8 @@ const scenarios: Scenario[] = [
     description: "Aide efficace au chargement, transport de vos meubles ou cartons de déménagement en Gironde, et libération rapide de vos anciens locaux.",
     beforeImg: 'https://images.unsplash.com/photo-1600513524458-297ba52937ae?auto=format&fit=crop&q=80&w=800',
     afterImg: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?auto=format&fit=crop&q=80&w=800',
-    category: 'demenagement'
+    category: 'demenagement',
+    city: "Talence (33400)"
   },
   {
     id: 'nettoyage',
@@ -73,6 +78,7 @@ const scenarios: Scenario[] = [
     beforeImg: 'https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&q=80&w=800',
     afterImg: 'https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&q=80&w=800',
     category: 'nettoyage',
+    city: "Villenave-d'Ornon (33140)",
     disabled: true,
     statusText: 'Bientôt'
   },
@@ -84,6 +90,7 @@ const scenarios: Scenario[] = [
     beforeImg: 'https://images.unsplash.com/photo-1563453392212-326f5e854473?auto=format&fit=crop&q=80&w=800',
     afterImg: 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?auto=format&fit=crop&q=80&w=800',
     category: 'nettoyage',
+    city: "Bègles (33130)",
     disabled: true,
     statusText: 'Bientôt'
   }
@@ -163,7 +170,7 @@ export default function BeforeAfterGallery() {
             Preuves d'Excellence
           </span>
           <h2 className="text-3xl md:text-5xl font-black font-display text-slate-900 tracking-tight leading-tight">
-            Réalisations Avant / Après
+            Interventions Avant / Après
           </h2>
           <p className="text-slate-500 text-xs sm:text-sm max-w-xl mx-auto mt-2 font-semibold font-sans">
             Faites glisser la poignée centrale pour révéler en temps réel l'impact du travail soigné de Damien.
@@ -287,6 +294,18 @@ export default function BeforeAfterGallery() {
               <div className="absolute top-4 left-[50%] -translate-x-[50%] bg-slate-900/60 backdrop-blur-md text-white text-[9px] font-black uppercase tracking-widest py-1 px-3.5 rounded-full pointer-events-none animate-pulse text-center font-sans">
                 Faites glisser pour comparer
               </div>
+            </div>
+
+            {/* City display under the photo for SEO */}
+            <div className="mt-3.5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 px-1 text-slate-500 font-sans font-semibold text-xs">
+              <span className="inline-flex items-center gap-1.5 text-emerald-800 bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-100/50 w-fit">
+                <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span>Ville d'intervention : </span>
+                <strong className="text-emerald-950 font-black">{currentScenario.city}</strong>
+              </span>
+              <span className="text-[10px] text-slate-400 self-start sm:self-center">
+                Gironde (33) • Intervention certifiée Damien Pommier
+              </span>
             </div>
           </div>
 

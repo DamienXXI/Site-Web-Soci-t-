@@ -16,7 +16,7 @@ interface FAQItem {
 }
 
 export default function ConseilsAndFAQ() {
-  const [openFAQIndex, setOpenFAQIndex] = useState<number | null>(0);
+  const [openStates, setOpenStates] = useState<Record<number, boolean>>({});
   const [selectedArticle, setSelectedArticle] = useState<Article | null>(null);
 
   const articles: Article[] = [
@@ -63,6 +63,10 @@ export default function ConseilsAndFAQ() {
   ];
 
   const faqItems: FAQItem[] = [
+    {
+      question: "Quels sont vos secteurs et communes d'intervention autour de Bordeaux et en Gironde ?",
+      answer: "Damien Pommier intervient rapidement (sous 24h à 48h) dans toutes les villes dans un rayon de 50km autour de Bordeaux et plus généralement dans l'ensemble du département de la Gironde (33). Les principales communes desservies comprennent : Bordeaux, Mérignac, Pessac, Talence, Villenave-d'Ornon, Saint-Médard-en-Jalles, Bègles, Cenon, Gradignan, Lormont, Eysines, Cestas, Floirac, Blanquefort, Bruges, Ambarès-et-Lagrave, Le Bouscat, Léognan, Saint-André-de-Cubzac, Libourne, Gujan-Mestras, Castelnau-de-Médoc, Créon, Saint-Jean-d'Illac, Martignas-sur-Jalle, Canéjan, Carbon-Blanc, Bassens, Saint-Loubès, Artigues-près-Bordeaux, Parempuyre, Le Taillan-Médoc, Saint-Aubin-de-Médoc, Ludon-Médoc, Macau, Langon, Cadillac, Podensac, Portets, Saint-Sulpice-et-Cameyrac, Bouliac, Latresne, Fargues-Saint-Hilaire, Sadirac, Carignan-de-Bordeaux, Blaye, Saint-Émilion, Izon, Saint-Denis-de-Pile, Coutras, Biganos, Audenge, Lanton, Andernos-les-Bains, Marcheprime, Salles, Belin-Béliet, Saint-Selve, La Brède, Martillac, Beautiran, Castres-Gironde, Arsac, Pian-Médoc, Saucats, Le Barp, Tresses, Yvrac, Cénac, Camblanes-et-Meynac, Quinsac, Saint-Caprais-de-Bordeaux, Lignan-de-Bordeaux, Sainte-Eulalie, Montussan, Beychac-et-Caillau, Vayres, Arveyres, Fronsac, Saint-Germain-du-Puch, Baron, Nérigean... Nous nous déplaçons gratuitement pour évaluer le volume à vider et vous proposer un devis personnalisé."
+    },
     {
       question: "Quels sont vos tarifs pour un débarras en Gironde ?",
       answer: "Nos tarifs sont calculés de manière transparente et sur-mesure. Ils dépendent de trois facteurs clés : le volume total à évacuer (en m³), l'accessibilité des locaux (étages, ascenseur, distance de portage jusqu'au camion) et l'éventuelle valeur des objets récupérables (qui vient en déduction du coût de l'intervention)."
@@ -162,16 +166,46 @@ export default function ConseilsAndFAQ() {
             </p>
           </div>
 
+          {/* Ergonomic expand/collapse controls */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6 px-1">
+            <span className="text-[11px] font-bold text-slate-400">
+              💡 Cliquez sur une question pour déplier la réponse ou utilisez les commandes rapides :
+            </span>
+            <div className="flex items-center gap-2 self-end sm:self-auto">
+              <button
+                onClick={() => {
+                  const allOpen: Record<number, boolean> = {};
+                  faqItems.forEach((_, i) => { allOpen[i] = true; });
+                  setOpenStates(allOpen);
+                }}
+                className="text-[10px] font-extrabold text-emerald-800 bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-100/60 px-3 py-1.5 rounded-xl uppercase tracking-wider transition cursor-pointer"
+              >
+                Tout déplier
+              </button>
+              <button
+                onClick={() => setOpenStates({})}
+                className="text-[10px] font-extrabold text-slate-500 bg-slate-100 hover:bg-slate-200/80 border border-slate-200/60 px-3 py-1.5 rounded-xl uppercase tracking-wider transition cursor-pointer"
+              >
+                Tout replier
+              </button>
+            </div>
+          </div>
+
           <div className="space-y-4">
             {faqItems.map((item, idx) => {
-              const isOpen = openFAQIndex === idx;
+              const isOpen = !!openStates[idx];
               return (
                 <div 
                   key={idx}
                   className="bg-white rounded-2xl border border-slate-150 overflow-hidden shadow-xs hover:border-slate-300 transition-colors"
                 >
                   <button
-                    onClick={() => setOpenFAQIndex(isOpen ? null : idx)}
+                    onClick={() => {
+                      setOpenStates(prev => ({
+                        ...prev,
+                        [idx]: !prev[idx]
+                      }));
+                    }}
                     className="w-full text-left p-5 flex items-center justify-between gap-4 font-sans font-bold text-slate-900 text-sm md:text-base hover:bg-slate-50/50 transition cursor-pointer"
                   >
                     <span className="flex items-center gap-3">
@@ -183,7 +217,7 @@ export default function ConseilsAndFAQ() {
 
                   <div 
                     className={`transition-all duration-350 ease-in-out overflow-hidden ${
-                      isOpen ? 'max-h-[500px] border-t border-slate-100' : 'max-h-0'
+                      isOpen ? 'max-h-[800px] border-t border-slate-100' : 'max-h-0'
                     }`}
                   >
                     <div className="p-5 text-slate-600 text-xs md:text-sm leading-relaxed font-semibold bg-slate-50/30">

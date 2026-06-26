@@ -62,6 +62,7 @@ const MyRequestsDrawer = React.lazy(() => import('./components/MyRequestsDrawer'
 const AccountComponent = React.lazy(() => import('./components/AccountComponent'));
 const BeforeAfterGallery = React.lazy(() => import('./components/BeforeAfterGallery'));
 const ConseilsAndFAQ = React.lazy(() => import('./components/ConseilsAndFAQ'));
+const SitemapTextuel = React.lazy(() => import('./components/SitemapTextuel'));
 
 interface StatCounterProps {
   endValue: number;
@@ -272,7 +273,7 @@ export default function App() {
     const pageMeta: Record<string, { title: string; description: string; keywords: string }> = {
       accueil: {
         title: "Damien Pommier | Débarras, Nettoyage & Déménagement en Gironde (33)",
-        description: "Services professionnels de débarras de maison, enlèvement d'encombrants, nettoyage de logement et aide au déménagement en Gironde et région bordelaise. Devis gratuit sous 24h.",
+        description: "Services professionnels de débarras de maison, enlèvement d'encombrants, nettoyage de logement et aide au déménagement en Gironde et région bordelaise. Devis gratuit sous 24h/48h.",
         keywords: "débarras gironde, débarras maison bordeaux, enlèvement encombrants, déménagement bordeaux, nettoyage maison gironde, vide maison gironde, débarras gratuit"
       },
       enlevements: {
@@ -306,9 +307,9 @@ export default function App() {
         keywords: "terrassement jardin bordeaux, nettoyage terrasse gironde, nivellement terrain bordeaux, dessouchage gironde, travaux exterieurs gironde"
       },
       galerie: {
-        title: "Réalisations Avant / Après | Damien Pommier",
-        description: "Découvrez notre sélection interactive de photos Avant / Après illustrant nos réalisations de débarras de maisons, caves, greniers et déménagements en Gironde.",
-        keywords: "debarras avant apres, réalisations photos debarras bordeaux, nettoyage diogene photos, photos debarras gironde, tri debarras"
+        title: "Interventions Avant / Après | Damien Pommier",
+        description: "Découvrez notre sélection interactive de photos Avant / Après illustrant nos interventions de débarras de maisons, caves, greniers et déménagements en Gironde.",
+        keywords: "debarras avant apres, interventions photos debarras bordeaux, nettoyage diogene photos, photos debarras gironde, tri debarras"
       }
     };
 
@@ -543,7 +544,7 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Réalisations Tab */}
+              {/* Interventions Tab */}
               <button 
                 onClick={() => {
                   setCurrentPage('galerie');
@@ -555,7 +556,7 @@ export default function App() {
                     : 'bg-white hover:bg-emerald-50 text-emerald-600 border-emerald-500 shadow-emerald-500/5'
                 }`}
               >
-                📸 Réalisations
+                📸 Interventions
               </button>
                
               <button 
@@ -653,7 +654,7 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Réalisations Link on Mobile */}
+              {/* Interventions Link on Mobile */}
               <div>
                 <button
                   onClick={() => { setCurrentPage('galerie'); setMobileMenuOpen(false); }}
@@ -661,7 +662,7 @@ export default function App() {
                     currentPage === 'galerie' ? 'text-emerald-800 bg-emerald-50 border border-emerald-100/50' : 'text-slate-700 hover:bg-slate-50'
                   }`}
                 >
-                  📸 Réalisations
+                  📸 Interventions
                 </button>
               </div>
 
@@ -915,10 +916,6 @@ export default function App() {
             </ScrollReveal>
           </motion.div>
 
-          {/* Conseils Débarras & FAQ Sections */}
-          <React.Suspense fallback={<LoadingSpinner />}>
-            <ConseilsAndFAQ />
-          </React.Suspense>
         </>
       )}
 
@@ -1501,6 +1498,69 @@ export default function App() {
         </div>
       )}
 
+      {/* Conseils Débarras & FAQ Sections - Persistent bottom band above footer */}
+      <React.Suspense fallback={<LoadingSpinner />}>
+        <ConseilsAndFAQ />
+      </React.Suspense>
+
+      {/* Textual Sitemap for advanced SEO navigation */}
+      <React.Suspense fallback={<LoadingSpinner />}>
+        <SitemapTextuel setCurrentPage={setCurrentPage} setActiveModal={setActiveModal} />
+      </React.Suspense>
+
+      {/* Schema.org JSON-LD Structured Data for LocalBusiness SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            "name": "Damien Pommier - Débarras, Encombrants & Déménagement Gironde",
+            "image": "https://images.unsplash.com/photo-1600513524458-297ba52937ae?auto=format&fit=crop&q=80&w=800",
+            "@id": "https://damien-pommier-debarras.fr/#localbusiness",
+            "url": "https://damien-pommier-debarras.fr",
+            "telephone": "+33661292059",
+            "priceRange": "€€",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Bordeaux et communes de la Gironde",
+              "addressLocality": "Bordeaux",
+              "addressRegion": "Gironde",
+              "postalCode": "33000",
+              "addressCountry": "FR"
+            },
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": 44.837789,
+              "longitude": -0.57918
+            },
+            "openingHoursSpecification": {
+              "@type": "OpeningHoursSpecification",
+              "dayOfWeek": [
+                "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+              ],
+              "opens": "07:00",
+              "closes": "20:00"
+            },
+            "sameAs": [
+              "https://wa.me/33661292059"
+            ],
+            "areaServed": [
+              { "@type": "AdministrativeArea", "name": "Bordeaux" },
+              { "@type": "AdministrativeArea", "name": "Gironde" },
+              { "@type": "AdministrativeArea", "name": "Mérignac" },
+              { "@type": "AdministrativeArea", "name": "Pessac" },
+              { "@type": "AdministrativeArea", "name": "Talence" },
+              { "@type": "AdministrativeArea", "name": "Villenave-d'Ornon" },
+              { "@type": "AdministrativeArea", "name": "Bègles" },
+              { "@type": "AdministrativeArea", "name": "Libourne" },
+              { "@type": "AdministrativeArea", "name": "Cestas" },
+              { "@type": "AdministrativeArea", "name": "Gradignan" }
+            ]
+          })
+        }}
+      />
+
       {/* Beautiful styled premium footer with modal anchors */}
       <footer className="bg-slate-950 text-slate-400 pt-16 pb-10 border-t border-slate-900 font-sans">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1642,16 +1702,13 @@ export default function App() {
             
             <div className="space-y-3 text-xs text-slate-600 leading-relaxed">
               <p>
-                <strong>Dénomination sociale :</strong> DébarrasExpress SAS au capital social de 15 000 €.
+                <strong>Dénomination sociale :</strong> Damien Pommier.
               </p>
               <p>
-                <strong>Immatriculation :</strong> Inscrite au Registre du Commerce et des Sociétés de Paris sous le numéro SIRET <code className="font-mono bg-slate-100 px-1 py-0.5 rounded">849 059 104 00021</code>.
+                <strong>Immatriculation :</strong> Inscrite au Registre du Commerce et des Sociétés de Bordeaux sous le numéro SIRET <code className="font-mono bg-slate-100 px-1 py-0.5 rounded">990 183 394 00016</code>.
               </p>
-              <p>
-                <strong>Siège social :</strong> 142 Avenue de Clichy, 75017 Paris, France.
-              </p>
-              <p>
-                <strong>Assurances professionnelles :</strong> Police d'assurance responsabilité civile professionnelle souscrite auprès de la compagnie <strong>AXA assurances</strong> garantissant les vols accidentels, les dégâts de plomberie lors du déplacement des électroménagers ou détériorations de parties communes syndicales à hauteur de 5 000 000 € d'indemnité par sinistre.
+                        <p>
+                <strong>Assurances professionnelles :</strong> Police d'assurance responsabilité civile professionnelle souscrite auprès de la compagnie <strong>ACB ASSURANCES</strong> garantissant les vols accidentels, les dégâts de plomberie lors du déplacement des électroménagers ou détériorations de parties communes syndicales à hauteur de 5 000 000 € d'indemnité par sinistre.
               </p>
             </div>
 
@@ -1714,7 +1771,7 @@ export default function App() {
           <div className="bg-white/90 backdrop-blur-xl rounded-3xl max-w-lg w-full p-8 shadow-2xl border border-white/60 space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center border-b border-slate-200/55 pb-3">
               <h4 className="font-bold text-slate-900 text-base flex items-center gap-1.5">
-                <Recycle className="w-5 h-5 text-emerald-500 animate-spin" style={{ animationDuration: '8s' }} /> Mon process responsable déchèterie pro
+                <Recycle className="w-5 h-5 text-emerald-500 animate-spin" style={{ animationDuration: '8s' }} /> Mon process responsable déchèterie 
               </h4>
               <button onClick={() => setActiveModal(null)} className="p-1 hover:bg-slate-100 rounded-lg cursor-pointer">
                 <X className="w-4 h-4" />
