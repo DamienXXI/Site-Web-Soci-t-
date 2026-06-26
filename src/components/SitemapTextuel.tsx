@@ -31,7 +31,7 @@ export default function SitemapTextuel({ setCurrentPage, setActiveModal }: Sitem
         { label: "Accueil / Présentation", action: () => handleAnchorClick('accueil') },
         { label: "Enlèvement d'Encombrants & Débarras", action: () => handleAnchorClick('enlevements') },
         { label: "Service de Déménagement & Transport", action: () => handleAnchorClick('demenagement') },
-        { label: "Interventions Avant / Après (Galerie)", action: () => handleAnchorClick('galerie') },
+        { label: "Interventions Avant / Après (Galerie)", action: () => handleAnchorClick('galerie'), disabled: true },
         { label: "Calculateur de Volume m³", action: () => handleAnchorClick('accueil', 'calculateur-volume') },
         { label: "Foire Aux Questions (FAQ)", action: () => handleAnchorClick('accueil', 'faq') },
         { label: "Conseils de Débarras & Tri", action: () => handleAnchorClick('accueil', 'conseils-debarras') },
@@ -130,17 +130,28 @@ export default function SitemapTextuel({ setCurrentPage, setActiveModal }: Sitem
                 <span>{section.title}</span>
               </h4>
               <ul className="space-y-2 text-[11px] font-semibold text-slate-400">
-                {section.links.map((link, lIdx) => (
-                  <li key={lIdx}>
-                    <button
-                      onClick={link.action}
-                      className="hover:text-emerald-400 transition text-left cursor-pointer focus:outline-none flex items-center gap-1 group"
-                    >
-                      <span className="text-slate-650 group-hover:text-emerald-500 group-hover:translate-x-0.5 transition-transform">›</span>
-                      <span>{link.label}</span>
-                    </button>
-                  </li>
-                ))}
+                {section.links.map((link, lIdx) => {
+                  const isLinkDisabled = 'disabled' in link && link.disabled;
+                  return (
+                    <li key={lIdx}>
+                      <button
+                        onClick={isLinkDisabled ? undefined : link.action}
+                        disabled={isLinkDisabled}
+                        className={`transition text-left focus:outline-none flex items-center gap-1 group ${
+                          isLinkDisabled 
+                            ? 'text-slate-600 cursor-not-allowed select-none opacity-50' 
+                            : 'hover:text-emerald-400 cursor-pointer'
+                        }`}
+                      >
+                        <span className={`transition-transform ${isLinkDisabled ? 'text-slate-700' : 'text-slate-650 group-hover:text-emerald-500 group-hover:translate-x-0.5'}`}>›</span>
+                        <span>{link.label}</span>
+                        {isLinkDisabled && (
+                          <span className="ml-1.5 text-[8px] bg-slate-800 text-slate-500 px-1 py-0.5 rounded font-bold uppercase tracking-wider">indisponible</span>
+                        )}
+                      </button>
+                    </li>
+                  );
+                })}
               </ul>
             </div>
           ))}

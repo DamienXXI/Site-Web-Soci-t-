@@ -269,6 +269,11 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (currentPage === 'galerie') {
+      setCurrentPage('accueil');
+      return;
+    }
+
     // Dynamic titles, descriptions and keywords based on current page for local SEO (Gironde / Bordeaux)
     const pageMeta: Record<string, { title: string; description: string; keywords: string }> = {
       accueil: {
@@ -546,17 +551,11 @@ export default function App() {
 
               {/* Interventions Tab */}
               <button 
-                onClick={() => {
-                  setCurrentPage('galerie');
-                  window.scrollTo({ top: 0, behavior: 'smooth' });
-                }}
-                className={`text-xs px-4.5 py-2.5 rounded-full font-black uppercase tracking-wide flex items-center gap-1.5 transform cursor-pointer transition-all duration-200 hover:-translate-y-0.5 hover:scale-[1.03] border-2 shadow-md ${
-                  currentPage === 'galerie'
-                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white border-emerald-600 shadow-emerald-500/15'
-                    : 'bg-white hover:bg-emerald-50 text-emerald-600 border-emerald-500 shadow-emerald-500/5'
-                }`}
+                disabled
+                className="text-xs px-4.5 py-2.5 rounded-full font-black uppercase tracking-wide flex items-center gap-1.5 border-2 border-slate-200 bg-slate-100 text-slate-400 opacity-60 cursor-not-allowed select-none shadow-sm"
+                title="Service temporairement indisponible"
               >
-                📸 Interventions
+                📸 Interventions <span className="text-[9px] px-1.5 py-0.5 bg-slate-200 text-slate-500 rounded font-bold uppercase tracking-wider">indisponible</span>
               </button>
                
               <button 
@@ -657,12 +656,10 @@ export default function App() {
               {/* Interventions Link on Mobile */}
               <div>
                 <button
-                  onClick={() => { setCurrentPage('galerie'); setMobileMenuOpen(false); }}
-                  className={`w-full text-left block p-3 text-sm font-black rounded-xl cursor-pointer transition-all duration-200 hover:translate-x-1 ${
-                    currentPage === 'galerie' ? 'text-emerald-800 bg-emerald-50 border border-emerald-100/50' : 'text-slate-700 hover:bg-slate-50'
-                  }`}
+                  disabled
+                  className="w-full text-left block p-3 text-sm font-black rounded-xl bg-slate-50 text-slate-400 opacity-60 cursor-not-allowed select-none border border-slate-200/40"
                 >
-                  📸 Interventions
+                  📸 Interventions <span className="ml-1 text-[9px] px-1.5 py-0.5 bg-slate-200 text-slate-500 rounded font-bold uppercase tracking-wider">indisponible</span>
                 </button>
               </div>
 
