@@ -473,7 +473,7 @@ Référence de suivi : ${newQuote.id}
       const formData = new FormData();
       
       // A valid email is required by submission platforms to prevent spam rejection (400)
-      const senderEmail = newQuote.email && newQuote.email.trim() ? newQuote.email.trim() : "no-reply@debarras-express.fr";
+      const senderEmail = newQuote.email && newQuote.email.trim() ? newQuote.email.trim() : "no-reply@debarras-gironde.fr";
       
       if (isFormspree) {
         formData.append("subject", emailSubject);
@@ -1708,6 +1708,67 @@ Référence de suivi : ${newQuote.id}
         }}
       />
 
+      {/* Schema.org JSON-LD Structured Data for FAQPage SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Quels sont vos secteurs et communes d'intervention autour de Bordeaux et en Gironde ?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Damien Pommier intervient rapidement (sous 24h à 48h) dans toutes les villes dans un rayon de 50km autour de Bordeaux et plus généralement dans l'ensemble du département de la Gironde (33). Les principales communes desservies comprennent : Bordeaux, Mérignac, Pessac, Talence, Villenave-d'Ornon, Saint-Médard-en-Jalles, Bègles, Cenon, Gradignan, Lormont, Eysines, Cestas, Floirac, Blanquefort, Bruges, Ambarès-et-Lagrave, Le Bouscat, Léognan, Saint-André-de-Cubzac, Libourne, Gujan-Mestras, Castelnau-de-Médoc, Créon, Saint-Jean-d'Illac, Martignas-sur-Jalle, Canéjan, Carbon-Blanc, Bassens, Saint-Loubès, Artigues-près-Bordeaux, Parempuyre, Le Taillan-Médoc, Saint-Aubin-de-Médoc, Ludon-Médoc, Macau, Langon, Cadillac, Podensac, Portets, Saint-Sulpice-et-Cameyrac, Bouliac, Latresne, Fargues-Saint-Hilaire, Sadirac, Carignan-de-Bordeaux, Blaye, Saint-Émilion, Izon, Saint-Denis-de-Pile, Coutras, Biganos, Audenge, Lanton, Andernos-les-Bains, Marcheprime, Salles, Belin-Béliet, Saint-Selve, La Brède, Martillac, Beautiran, Castres-Gironde, Arsac, Pian-Médoc, Saucats, Le Barp, Tresses, Yvrac, Cénac, Camblanes-et-Meynac, Quinsac, Saint-Caprais-de-Bordeaux, Lignan-de-Bordeaux, Sainte-Eulalie, Montussan, Beychac-et-Caillau, Vayres, Arveyres, Fronsac, Saint-Germain-du-Puch, Baron, Nérigean... Nous nous déplaçons gratuitement pour évaluer le volume à vider et vous proposer un devis personnalisé."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Quels sont vos tarifs pour un débarras en Gironde ?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Nos tarifs sont calculés de manière transparente et sur-mesure. Ils dépendent de trois facteurs clés : le volume total à évacuer (en m³), l'accessibilité des locaux (étages, ascenseur, distance de portage jusqu'au camion) et l'éventuelle valeur des objets récupérables (qui vient en déduction du coût de l'intervention)."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Combien de temps dure une intervention classique ?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "La plupart de nos débarras de caves, garages ou appartements se font en une seule journée. Pour des maisons entières ou des chantiers Diogène très encombrés, l'intervention peut s'étendre sur 2 à 3 jours. Nous nous engageons à respecter scrupuleusement les délais convenus."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Que faites-vous des affaires personnelles et documents importants ?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "La discrétion et le respect de votre vie privée sont nos priorités. Lors du débarras, si nous découvrons des photos de famille, des testaments, des actes notariés, des bijoux ou de l'argent liquide, nous les mettons immédiatement de côté dans un carton sécurisé que nous vous remettons en main propre à la fin du chantier."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Intervenez-vous pour des cas de syndrome de Diogène ou de logements insalubres ?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Oui, nous sommes équipés et formés pour intervenir dans les situations d'insalubrité extrême, de logement de personnes atteintes du syndrome de Diogène ou après des sinistres. Nous réalisons le tri, l'évacuation complète des déchets, le nettoyage minutieux et la désinfection totale des pièces."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Comment puis-je obtenir un devis ou une estimation précise ?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "C'est très simple et gratuit ! Vous pouvez utiliser notre simulateur de m³ en ligne ci-dessus, nous appeler directement au 06 61 29 20 59, ou nous envoyer des photos du chantier par SMS ou par email. Si nécessaire, nous nous déplaçons gratuitement chez vous pour évaluer le travail et vous proposer un devis ferme sous 24h."
+                }
+              }
+            ]
+          })
+        }}
+      />
+
       {/* Beautiful styled premium footer with modal anchors */}
       <footer className="bg-slate-950 text-slate-400 pt-16 pb-10 border-t border-slate-900 font-sans">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -1786,7 +1847,7 @@ Référence de suivi : ${newQuote.id}
                     }}
                     className="hover:text-emerald-400 hover:underline transition block"
                   >
-                    Débarras Mérignac
+                    Débarras Mérignac (33700)
                   </a>
                 </li>
                 <li>
@@ -1799,7 +1860,7 @@ Référence de suivi : ${newQuote.id}
                     }}
                     className="hover:text-emerald-400 hover:underline transition block"
                   >
-                    Débarras Pessac
+                    Débarras Pessac (33600)
                   </a>
                 </li>
                 <li>
@@ -1812,7 +1873,7 @@ Référence de suivi : ${newQuote.id}
                     }}
                     className="hover:text-emerald-400 hover:underline transition block"
                   >
-                    Débarras Talence
+                    Débarras Talence (33400)
                   </a>
                 </li>
                 <li>
@@ -1825,7 +1886,7 @@ Référence de suivi : ${newQuote.id}
                     }}
                     className="hover:text-emerald-400 hover:underline transition block"
                   >
-                    Débarras Villenave-d'Ornon
+                    Débarras Villenave-d'Ornon (33140)
                   </a>
                 </li>
                 <li>
@@ -1838,7 +1899,7 @@ Référence de suivi : ${newQuote.id}
                     }}
                     className="hover:text-emerald-400 hover:underline transition block"
                   >
-                    Débarras Bègles
+                    Débarras Bègles (33130)
                   </a>
                 </li>
               </ul>
@@ -2030,7 +2091,7 @@ Référence de suivi : ${newQuote.id}
                 Conformément au Règlement Général sur la Protection des Données (RGPD 2016/679) de l'Union Européenne, je vous informe que les données transmises via mon outil de calcul m³ ou mon standard téléphonique font l'objet d'un chiffrement sécurisé.
               </p>
               <p>
-                <strong>Propriétaire du traitement :</strong> DébarrasExpress France SAS.
+                <strong>Propriétaire du traitement :</strong> Débarras Gironde SAS.
               </p>
               <p>
                 <strong>Finalités :</strong> Vos données (identité, téléphone, volume d'intervention, localisation postal) servent exclusivement à vous émettre un devis et fixer la date de vidage. Aucun usage commercial ou revente à des assureurs ou plates-formes de démarchage tiers n'est effectué.

@@ -95,3 +95,64 @@ html {
   animation-play-state: paused;
 }
 
+/* Print Media Queries for clean printing of quotes and invoice receipts */
+@media print {
+  /* Hide interactive, overlay, and navigation elements */
+  header,
+  footer,
+  nav,
+  button,
+  .no-print,
+  .btn,
+  [role="dialog"],
+  .fixed,
+  .sticky,
+  .shadow-xl,
+  .shadow-2xl,
+  .backdrop-blur-sm,
+  .backdrop-blur-2xl,
+  iframe,
+  input,
+  textarea,
+  select {
+    display: none !important;
+  }
+
+  /* Reset background and text for high legibility and low ink consumption */
+  body, html, #main-app-container {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-family: ui-sans-serif, system-ui, sans-serif !important;
+    font-size: 12pt !important;
+    width: 100% !important;
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  /* Make sure printing modals or drawer content fills the sheet properly */
+  .absolute.inset-y-0.right-0 {
+    position: static !important;
+    width: 100% !important;
+    height: auto !important;
+    box-shadow: none !important;
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  /* Keep table / card lists clean on white paper */
+  .border {
+    border-color: #cbd5e1 !important;
+  }
+
+  .bg-white\/60, .bg-white\/90, .bg-slate-900\/40 {
+    background: #ffffff !important;
+    color: #000000 !important;
+  }
+
+  h1, h2, h3, h4 {
+    color: #000000 !important;
+    page-break-after: avoid;
+  }
+}
+
+

@@ -104,6 +104,19 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
   const [photoFiles, setPhotoFiles] = useState<PhotoFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
 
+  // Custom items states for adding bespoke objects
+  const [customItems, setCustomItems] = useState<Array<{ id: string; name: string; quantity: number; m3: number; length?: string; width?: string; height?: string }>>([]);
+  const [custName, setCustName] = useState('');
+  const [custQty, setCustQty] = useState(1);
+  const [custMode, setCustMode] = useState<'dimensions' | 'vol'>('dimensions');
+  const [custLength, setCustLength] = useState('');
+  const [custWidth, setCustWidth] = useState('');
+  const [custHeight, setCustHeight] = useState('');
+  const [custM3, setCustM3] = useState('');
+  const [custNameError, setCustNameError] = useState(false);
+  const [custDimensionsError, setCustDimensionsError] = useState(false);
+  const [custVolumeError, setCustVolumeError] = useState(false);
+
   const processFile = (file: File) => {
     const id = Math.random().toString(36).substring(2, 9);
     const sizeStr = (file.size / (1024 * 1024)).toFixed(2) + ' Mo';
@@ -228,9 +241,10 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
 
   const clearCalculator = () => {
     setQuantities({});
+    setCustomItems([]);
   };
 
-  // Compute total volume
+  // Compute total volume including standard list and custom items
   const totalVolume = useMemo(() => {
     let vol = 0;
     Object.entries(quantities).forEach(([itemId, val]) => {
@@ -241,8 +255,12 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
         vol += matched.volumeM3 * qty;
       }
     });
+    // Add custom sur-mesure items
+    customItems.forEach(item => {
+      vol += item.m3 * item.quantity;
+    });
     return Math.round(vol * 100) / 100;
-  }, [quantities]);
+  }, [quantities, customItems]);
 
   // Compute price ranges based on totalVolume & accessibility
   const priceRange = useMemo(() => {
@@ -291,6 +309,10 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
 
     // Simulate reliable API call to process quote within 2hr SLA
     setTimeout(() => {
+      const customItemsDetails = customItems.length > 0
+        ? `\n\n[OBJETS SUR-MESURE AJOUTÉS]:\n${customItems.map(i => `- ${i.name}: x${i.quantity} (${parseFloat((i.m3 * i.quantity).toFixed(3))} m³ ${i.length ? `[${i.length}x${i.width}x${i.height} cm]` : ''})`).join('\n')}`
+        : '';
+
       const newQuote: QuoteRequest = {
         id: 'Devis-2026' + Math.floor(1000 + Math.random() * 9000),
         fullName,
@@ -301,11 +323,14 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
         city,
         serviceType,
         estimatedVolumeM3: totalVolume,
-        selectedItems: { ...quantities },
+        selectedItems: { 
+          ...quantities,
+          ...Object.fromEntries(customItems.map(i => [`📐 [Sur-mesure] ${i.name} (${parseFloat(i.m3.toFixed(3))} m³ / u)`, i.quantity]))
+        },
         floor,
         hasElevator,
         parkingDistance,
-        additionalDetails,
+        additionalDetails: additionalDetails + customItemsDetails,
         estimatedPrice: `${priceRange.min} € HT`,
         photos,
         createdAt: new Date().toISOString(),
@@ -478,9 +503,21 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
                       >
                         <Minus className="w-4 h-4" />
                       </button>
-                      <span className={`w-6 text-center font-black text-sm ${qty > 0 ? 'text-emerald-700 text-base' : 'text-slate-400'}`}>
-                        {qty}
-                      </span>
+                      <input
+                        type="number"
+                        min="0"
+                        value={qty}
+                        onChange={(e) => {
+                          const val = Math.max(0, parseInt(e.target.value) || 0);
+                          setQuantities(prev => ({
+                            ...prev,
+                            [item.id]: val
+                          }));
+                        }}
+                        className={`w-12 text-center font-black text-sm bg-white/70 border border-slate-200 rounded-lg py-1.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none ${
+                          qty > 0 ? 'text-emerald-800 font-extrabold' : 'text-slate-400 font-bold'
+                        }`}
+                      />
                       <button
                         type="button"
                         onClick={() => incrementItem(item.id)}
@@ -494,10 +531,287 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
               })}
             </div>
 
+            {/* List of custom sur-mesure items added */}
+            {customItems.length > 0 && (
+              <div className="space-y-2 bg-white/40 border border-white/60 p-4 rounded-3xl">
+                <span className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Vos Objets Personnalisés Ajoutés :</span>
+                <div className="space-y-1.5">
+                  {customItems.map((item) => (
+                    <div key={item.id} className="flex items-center justify-between bg-white/70 border border-slate-150 rounded-2xl p-3 shadow-xs text-xs">
+                      <div className="flex items-baseline gap-2">
+                        <span className="font-bold text-slate-850">{item.name}</span>
+                        <span className="text-[10px] text-slate-400 font-sans">
+                          (x{item.quantity} • {parseFloat(item.m3.toFixed(3))} m³ /u {item.length ? `[${item.length}x${item.width}x${item.height} cm]` : ''})
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="font-bold text-emerald-700">{parseFloat((item.m3 * item.quantity).toFixed(3))} m³</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setCustomItems(customItems.filter(i => i.id !== item.id));
+                          }}
+                          className="p-1 px-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg transition"
+                          title="Supprimer"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Interactive Custom Item Adder Section */}
+            <div className="border-t border-slate-200/50 pt-6 mt-6 bg-slate-50/50 -mx-6 md:-mx-10 px-6 md:px-10 pb-4 rounded-b-3xl">
+              <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider mb-2 flex items-center gap-2">
+                <span>📐</span>
+                <span>Projet Particulier ? Ajoutez un objet sur-mesure</span>
+              </h4>
+              <p className="text-[11px] text-slate-500 font-medium leading-normal mb-4">
+                Si vous possédez un meuble rare ou hors-gabarit, entrez ses dimensions ou son volume estimé pour que l'algorithme calcule son volume exact.
+              </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div className="sm:col-span-2">
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Nom personnalisé de l'objet *</label>
+                  <input
+                    type="text"
+                    value={custName}
+                    onChange={(e) => {
+                      setCustName(e.target.value);
+                      setCustNameError(false);
+                    }}
+                    placeholder="ex: Grand buffet, Coffre fort, Billard..."
+                    className={`w-full bg-white border rounded-xl py-2 px-3 text-xs focus:ring-1 font-medium transition-colors ${
+                      custNameError
+                        ? 'border-[#800020] bg-[#800020]/5 focus:ring-[#800020] focus:border-[#800020] text-[#800020] placeholder-[#800020]/60'
+                        : 'border-slate-200 focus:ring-emerald-500 text-slate-800'
+                    }`}
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Quantité</label>
+                  <div className="flex items-center gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setCustQty(Math.max(1, custQty - 1))}
+                      className="w-8 h-8 bg-white border border-slate-200 text-slate-600 rounded-lg font-bold text-sm hover:bg-slate-100 transition"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      min="1"
+                      value={custQty}
+                      onChange={(e) => setCustQty(Math.max(1, parseInt(e.target.value) || 1))}
+                      className="font-bold text-xs text-slate-900 w-12 text-center bg-white border border-slate-200 rounded-lg py-1.5 focus:outline-none focus:ring-1 focus:ring-emerald-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setCustQty(custQty + 1)}
+                      className="w-8 h-8 bg-white border border-slate-200 text-slate-600 rounded-lg font-bold text-sm hover:bg-slate-100 transition"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t border-slate-200/40 my-3 pt-3">
+                <div className="flex flex-wrap items-center gap-4 mb-3 text-xs">
+                  <span className="font-bold text-slate-500 text-[10px] uppercase tracking-wider">Mode de calcul :</span>
+                  <label className="flex items-center gap-1.5 cursor-pointer font-medium text-slate-700">
+                    <input
+                      type="radio"
+                      name="custMode"
+                      checked={custMode === 'dimensions'}
+                      onChange={() => setCustMode('dimensions')}
+                      className="text-emerald-500 focus:ring-emerald-500"
+                    />
+                    Calcul par dimensions (Long. x Larg. x Haut.)
+                  </label>
+                  <label className="flex items-center gap-1.5 cursor-pointer font-medium text-slate-700">
+                    <input
+                      type="radio"
+                      name="custMode"
+                      checked={custMode === 'vol'}
+                      onChange={() => setCustMode('vol')}
+                      className="text-emerald-500 focus:ring-emerald-500"
+                    />
+                    Saisie directe en m³
+                  </label>
+                </div>
+
+                {custMode === 'dimensions' ? (
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Longueur (cm)</span>
+                      <input
+                        type="number"
+                        min="1"
+                        value={custLength}
+                        onChange={(e) => {
+                          setCustLength(e.target.value);
+                          setCustDimensionsError(false);
+                        }}
+                        placeholder="ex: 120"
+                        className={`w-full bg-white border rounded-xl py-1.5 px-3 text-xs focus:ring-1 text-center font-bold transition-colors ${
+                          custDimensionsError
+                            ? 'border-[#800020] bg-[#800020]/5 focus:ring-[#800020] focus:border-[#800020] text-[#800020] placeholder-[#800020]/60'
+                            : 'border-slate-150 focus:ring-emerald-500 text-slate-850'
+                        }`}
+                      />
+                    </div>
+                    <div>
+                      <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Largeur / Prof. (cm)</span>
+                      <input
+                        type="number"
+                        min="1"
+                        value={custWidth}
+                        onChange={(e) => {
+                          setCustWidth(e.target.value);
+                          setCustDimensionsError(false);
+                        }}
+                        placeholder="ex: 60"
+                        className={`w-full bg-white border rounded-xl py-1.5 px-3 text-xs focus:ring-1 text-center font-bold transition-colors ${
+                          custDimensionsError
+                            ? 'border-[#800020] bg-[#800020]/5 focus:ring-[#800020] focus:border-[#800020] text-[#800020] placeholder-[#800020]/60'
+                            : 'border-slate-150 focus:ring-emerald-500 text-slate-850'
+                        }`}
+                      />
+                    </div>
+                    <div>
+                      <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Hauteur (cm)</span>
+                      <input
+                        type="number"
+                        min="1"
+                        value={custHeight}
+                        onChange={(e) => {
+                          setCustHeight(e.target.value);
+                          setCustDimensionsError(false);
+                        }}
+                        placeholder="ex: 80"
+                        className={`w-full bg-white border rounded-xl py-1.5 px-3 text-xs focus:ring-1 text-center font-bold transition-colors ${
+                          custDimensionsError
+                            ? 'border-[#800020] bg-[#800020]/5 focus:ring-[#800020] focus:border-[#800020] text-[#800020] placeholder-[#800020]/60'
+                            : 'border-slate-150 focus:ring-emerald-500 text-slate-850'
+                        }`}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div>
+                    <span className="block text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-1">Volume de l'objet (m³)</span>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="0.1"
+                      value={custM3}
+                      onChange={(e) => {
+                        setCustM3(e.target.value);
+                        setCustVolumeError(false);
+                      }}
+                      placeholder="ex: 2.5"
+                      className={`w-40 bg-white border rounded-xl py-1.5 px-3 text-xs focus:ring-1 font-bold transition-colors ${
+                        custVolumeError
+                          ? 'border-[#800020] bg-[#800020]/5 focus:ring-[#800020] focus:border-[#800020] text-[#800020] placeholder-[#800020]/60'
+                          : 'border-slate-150 focus:ring-emerald-500 text-slate-850'
+                      }`}
+                    />
+                  </div>
+                )}
+
+                {/* Live volume calculated projection */}
+                {custMode === 'dimensions' && custLength && custWidth && custHeight && (
+                  <div className="mt-3 text-[11px] font-sans text-emerald-700 bg-emerald-50/50 py-1.5 px-3 rounded-xl inline-block border border-emerald-150/40">
+                    ✨ Volume estimé : <strong>{parseFloat((((Number(custLength) || 0) * (Number(custWidth) || 0) * (Number(custHeight) || 0)) / 1000000).toFixed(3))} m³</strong> par unité.
+                  </div>
+                )}
+              </div>
+
+              {/* Error alerts rendered in Bordeaux red */}
+              {(custNameError || custDimensionsError || custVolumeError) && (
+                <div className="mt-4 p-3.5 bg-[#800020]/10 border border-[#800020] rounded-xl text-[#800020] text-xs font-bold leading-relaxed space-y-1 font-sans">
+                  <p className="flex items-center gap-1.5 font-black text-[13px] uppercase">
+                    <span>⚠️</span>
+                    <span>Oubli de saisie détecté</span>
+                  </p>
+                  <ul className="list-disc pl-4 space-y-0.5 font-semibold text-[11px]">
+                    {custNameError && <li>Veuillez indiquer un "Nom de l'objet" pour pouvoir l'ajouter.</li>}
+                    {custDimensionsError && <li>Veuillez renseigner toutes les dimensions (Longueur, Largeur, Hauteur) de l'objet.</li>}
+                    {custVolumeError && <li>Veuillez saisir un volume valide supérieur à 0 m³.</li>}
+                  </ul>
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={() => {
+                  let hasError = false;
+                  setCustNameError(false);
+                  setCustDimensionsError(false);
+                  setCustVolumeError(false);
+
+                  if (!custName.trim()) {
+                    setCustNameError(true);
+                    hasError = true;
+                  }
+
+                  let calcM = 0;
+                  if (custMode === 'dimensions') {
+                    const L = parseFloat(custLength) || 0;
+                    const W = parseFloat(custWidth) || 0;
+                    const H = parseFloat(custHeight) || 0;
+                    if (L <= 0 || W <= 0 || H <= 0) {
+                      setCustDimensionsError(true);
+                      hasError = true;
+                    } else {
+                      calcM = (L * W * H) / 1000000;
+                    }
+                  } else {
+                    calcM = parseFloat(custM3) || 0;
+                    if (calcM <= 0) {
+                      setCustVolumeError(true);
+                      hasError = true;
+                    }
+                  }
+
+                  if (hasError) {
+                    return;
+                  }
+
+                  const newCustom = {
+                    id: 'cust-' + Date.now(),
+                    name: custName.trim(),
+                    quantity: custQty,
+                    m3: calcM,
+                    length: custMode === 'dimensions' ? custLength : undefined,
+                    width: custMode === 'dimensions' ? custWidth : undefined,
+                    height: custMode === 'dimensions' ? custHeight : undefined
+                  };
+
+                  setCustomItems([...customItems, newCustom]);
+
+                  // Reset forms
+                  setCustName('');
+                  setCustQty(1);
+                  setCustLength('');
+                  setCustWidth('');
+                  setCustHeight('');
+                  setCustM3('');
+                }}
+                className="mt-4 w-full py-2.5 px-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-black uppercase tracking-wider transition shadow-sm hover:shadow cursor-pointer"
+              >
+                + Ajouter cet objet au simulateur
+              </button>
+            </div>
+
             {/* Quick summary check */}
             {totalVolume > 0 && (
               <div className="flex items-center justify-between p-4 bg-white/40 backdrop-blur-sm rounded-2xl border border-white/60">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Objets sélectionnés ({selectedItemsSummaryList.length})</span>
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Objets sélectionnés ({selectedItemsSummaryList.length + customItems.length})</span>
                 <button
                   type="button"
                   onClick={clearCalculator}

@@ -75,7 +75,7 @@ export const TESTIMONIALS: Testimonial[] = [
     location: 'Lyon (6ème)',
     role: 'Responsable Services Généraux',
     rating: 5,
-    text: 'Je devais débarrasser 45 postes de travail en urgence avant la restitution des clés de mes anciens bureaux. DébarrasExpress est intervenu le samedi même. Efficace, respectueux et traçabilité DEEE impeccable !',
+    text: 'Je devais débarrasser 45 postes de travail en urgence avant la restitution des clés de mes anciens bureaux. Débarras Gironde est intervenu le samedi même. Efficace, respectueux et traçabilité DEEE impeccable !',
     date: '24 avril 2026',
     serviceType: 'Débarras de bureau'
   },

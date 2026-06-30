@@ -68,7 +68,7 @@ export default function MyRequestsDrawer({
           <div className="px-6 py-5 bg-white/95 border-b border-slate-200/55 text-slate-900 flex items-center justify-between relative">
             <div className="flex items-center gap-2">
               <div className="p-2 bg-emerald-100/80 border border-emerald-250/40 rounded-xl text-emerald-850 font-extrabold text-xs select-none">
-                Express
+                Gironde
               </div>
               <div>
                 <h4 className="font-extrabold text-slate-900 text-base font-display">Mes demandes</h4>
