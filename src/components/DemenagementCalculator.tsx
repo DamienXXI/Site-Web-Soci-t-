@@ -1271,7 +1271,7 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                   <div className="grid grid-cols-4 sm:grid-cols-5 gap-2 mt-2">
                     {demPhotos.map((photo, index) => (
                       <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-slate-150 bg-slate-50 shadow-xs">
-                        <img src={photo} alt={`Aperçu ${index + 1}`} className="w-full h-full object-cover" />
+                        <img src={photo} alt={`Aperçu ${index + 1}`} className="w-full h-full object-cover" loading="lazy" />
                         <button
                           type="button"
                           onClick={() => handleDemRemovePhoto(index)}

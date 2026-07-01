@@ -257,6 +257,7 @@ export default function BeforeAfterGallery() {
                 alt="Après intervention" 
                 className="absolute inset-0 w-full h-full object-cover pointer-events-none"
                 referrerPolicy="no-referrer"
+                loading="lazy"
               />
               <span className="absolute bottom-4 right-4 bg-emerald-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-md z-10 font-sans border border-emerald-500">
                 APRÈS
@@ -273,6 +274,7 @@ export default function BeforeAfterGallery() {
                   className="absolute inset-0 w-full h-full object-cover pointer-events-none"
                   style={{ width: containerRef.current?.getBoundingClientRect().width }}
                   referrerPolicy="no-referrer"
+                  loading="lazy"
                 />
                 <span className="absolute bottom-4 left-4 bg-rose-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full shadow-md z-10 font-sans border border-rose-500">
                   AVANT

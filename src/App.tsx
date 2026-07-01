@@ -580,7 +580,7 @@ Référence de suivi : ${newQuote.id}
   };
 
   return (
-    <div id="main-app-container" className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 font-sans text-slate-800 antialiased relative overflow-x-hidden overflow-y-auto">
+    <div id="main-app-container" className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 font-sans text-slate-800 antialiased relative">
       {/* Background Decor Blurred Circles */}
       <div className="absolute top-[-5%] right-[-10%] w-[500px] h-[500px] bg-emerald-200/40 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
       <div className="absolute top-[35%] left-[-10%] w-[600px] h-[600px] bg-teal-200/40 rounded-full blur-[130px] -z-10 pointer-events-none"></div>
@@ -607,6 +607,7 @@ Référence de suivi : ${newQuote.id}
                   alt="Logo Damien Pommier"
                   className="w-full h-full object-cover rounded-2xl shadow-md border border-emerald-500/20 transform group-hover:scale-105 duration-200 transition-transform"
                   referrerPolicy="no-referrer"
+                  loading="lazy"
                 />
               </button>
 
@@ -1182,6 +1183,7 @@ Référence de suivi : ${newQuote.id}
                         alt="Pichet Immobilier" 
                         className="w-full h-full object-contain rounded-xl" 
                         referrerPolicy="no-referrer" 
+                        loading="lazy"
                       />
                     )
                   },
@@ -1193,6 +1195,7 @@ Référence de suivi : ${newQuote.id}
                         alt="Cabinet Bedin" 
                         className="w-full h-full object-contain rounded-xl" 
                         referrerPolicy="no-referrer" 
+                        loading="lazy"
                       />
                     )
                   },
@@ -1204,6 +1207,7 @@ Référence de suivi : ${newQuote.id}
                         alt="Actia Concept" 
                         className="w-full h-full object-contain rounded-xl" 
                         referrerPolicy="no-referrer" 
+                        loading="lazy"
                       />
                     )
                   },
@@ -1215,6 +1219,7 @@ Référence de suivi : ${newQuote.id}
                         alt="Crédit Agricole Immobilier" 
                         className="w-full h-full object-contain rounded-xl" 
                         referrerPolicy="no-referrer" 
+                        loading="lazy"
                       />
                     )
                   },
@@ -1226,6 +1231,7 @@ Référence de suivi : ${newQuote.id}
                         alt="Immo de France Aquitaine" 
                         className="w-full h-full object-contain rounded-xl" 
                         referrerPolicy="no-referrer" 
+                        loading="lazy"
                       />
                     )
                   }
@@ -1246,6 +1252,7 @@ Référence de suivi : ${newQuote.id}
                         alt="Pichet Immobilier" 
                         className="w-full h-full object-contain rounded-xl" 
                         referrerPolicy="no-referrer" 
+                        loading="lazy"
                       />
                     )
                   },
@@ -1257,6 +1264,7 @@ Référence de suivi : ${newQuote.id}
                         alt="Cabinet Bedin" 
                         className="w-full h-full object-contain rounded-xl" 
                         referrerPolicy="no-referrer" 
+                        loading="lazy"
                       />
                     )
                   },
@@ -1268,6 +1276,7 @@ Référence de suivi : ${newQuote.id}
                         alt="Actia Concept" 
                         className="w-full h-full object-contain rounded-xl" 
                         referrerPolicy="no-referrer" 
+                        loading="lazy"
                       />
                     )
                   },
@@ -1279,6 +1288,7 @@ Référence de suivi : ${newQuote.id}
                         alt="Crédit Agricole Immobilier" 
                         className="w-full h-full object-contain rounded-xl" 
                         referrerPolicy="no-referrer" 
+                        loading="lazy"
                       />
                     )
                   },
@@ -1290,6 +1300,7 @@ Référence de suivi : ${newQuote.id}
                         alt="Immo de France Aquitaine" 
                         className="w-full h-full object-contain rounded-xl" 
                         referrerPolicy="no-referrer" 
+                        loading="lazy"
                       />
                     )
                   }
@@ -1870,6 +1881,7 @@ Référence de suivi : ${newQuote.id}
                   alt="Logo AlloServices33"
                   className="w-14 h-14 object-cover rounded-xl shadow-md border border-emerald-500/10"
                   referrerPolicy="no-referrer"
+                  loading="lazy"
                 />
                 <span className="font-display font-black text-slate-100 text-lg tracking-tight">AlloServices33</span>
               </button>
@@ -2322,6 +2334,7 @@ Référence de suivi : ${newQuote.id}
                   alt="Déménagement & Débarras Damien Pommier en Gironde"
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
+                  loading="lazy"
                 />
               </div>
 

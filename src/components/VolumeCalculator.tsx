@@ -1195,7 +1195,7 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
                                     <div className="w-4 h-4 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin"></div>
                                   </div>
                                 ) : (
-                                  <img src={p.dataUrl} alt={p.name} className="w-full h-full object-cover" />
+                                  <img src={p.dataUrl} alt={p.name} className="w-full h-full object-cover" loading="lazy" />
                                 )}
                               </div>
                               
