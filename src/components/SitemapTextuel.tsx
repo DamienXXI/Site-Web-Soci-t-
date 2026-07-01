@@ -113,7 +113,7 @@ export default function SitemapTextuel({ setCurrentPage, setActiveModal }: Sitem
               Sitemap & Index Référencement Gironde (33)
             </h3>
             <p className="text-[11px] text-slate-500 font-medium max-w-2xl mt-1.5">
-              Accédez directement à l'ensemble de nos services d'enlèvement d'encombrants, débarras de maison, appartement, cave et aide au déménagement. Damien Pommier dessert l'agglomération bordelaise et la Gironde sous 24/48h.
+              Accédez directement à l'ensemble de nos services d'enlèvement d'encombrants, débarras de maison, appartement, cave et aide au déménagement. AlloServices33 dessert l'agglomération bordelaise et la Gironde sous 24/48h.
             </p>
           </div>
           <div className="text-[10px] text-slate-550 font-mono bg-slate-950 px-3 py-1.5 rounded-lg border border-slate-800/80 w-fit">
@@ -160,7 +160,7 @@ export default function SitemapTextuel({ setCurrentPage, setActiveModal }: Sitem
         {/* Footer legal disclaimer of sitemap */}
         <div className="mt-10 pt-6 border-t border-slate-800/40 flex flex-col sm:flex-row justify-between items-center gap-3 text-[10px] text-slate-550 font-semibold">
           <span>
-            Damien Pommier — Entreprise locale d'enlèvement et débarras d'encombrants en Gironde.
+            AlloServices33 — Entreprise locale d'enlèvement et débarras d'encombrants en Gironde.
           </span>
           <span className="text-emerald-500/80 hover:text-emerald-400 cursor-pointer transition" onClick={() => handleAnchorClick('accueil')}>
             ↑ Retour à l'accueil

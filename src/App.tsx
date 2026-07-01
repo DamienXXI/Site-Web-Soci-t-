@@ -65,6 +65,7 @@ const AccountComponent = React.lazy(() => import('./components/AccountComponent'
 const BeforeAfterGallery = React.lazy(() => import('./components/BeforeAfterGallery'));
 const ConseilsAndFAQ = React.lazy(() => import('./components/ConseilsAndFAQ'));
 const SitemapTextuel = React.lazy(() => import('./components/SitemapTextuel'));
+const TestimonialsCarousel = React.lazy(() => import('./components/TestimonialsCarousel'));
 
 interface StatCounterProps {
   endValue: number;
@@ -295,7 +296,7 @@ export default function App() {
     // Dynamic titles, descriptions and keywords based on current page for local SEO (Gironde / Bordeaux)
     const pageMeta: Record<string, { title: string; description: string; keywords: string }> = {
       accueil: {
-        title: "Damien Pommier | Débarras, Nettoyage & Déménagement en Gironde (33)",
+        title: "AlloServices33 - Débarras, Déménagement en Gironde",
         description: "Services professionnels de débarras de maison, enlèvement d'encombrants, nettoyage de logement et aide au déménagement en Gironde et région bordelaise. Devis gratuit sous 24h/48h.",
         keywords: "débarras gironde, débarras maison bordeaux, enlèvement encombrants, déménagement bordeaux, nettoyage maison gironde, vide maison gironde, débarras gratuit"
       },
@@ -330,7 +331,7 @@ export default function App() {
         keywords: "terrassement jardin bordeaux, nettoyage terrasse gironde, nivellement terrain bordeaux, dessouchage gironde, travaux exterieurs gironde"
       },
       galerie: {
-        title: "Interventions Avant / Après | Damien Pommier",
+        title: "Interventions Avant / Après | AlloServices33",
         description: "Découvrez notre sélection interactive de photos Avant / Après illustrant nos interventions de débarras de maisons, caves, greniers et déménagements en Gironde.",
         keywords: "debarras avant apres, interventions photos debarras bordeaux, nettoyage diogene photos, photos debarras gironde, tri debarras"
       }
@@ -498,10 +499,14 @@ Référence de suivi : ${newQuote.id}
           const blob = dataURLtoBlob(photoBase64);
           if (blob) {
             const extension = blob.type.split('/')[1] || 'jpg';
-            // Web3forms supports file uploads. To upload multiple files via FormData, 
-            // the first field name can be 'attachment' and subsequent can be 'attachment_2', 'attachment_3', etc.
+            const filename = `photo_${index + 1}.${extension}`;
+            
+            // Web3Forms supports receiving files with any name, including 'photos_projet'
+            formData.append("photos_projet", blob, filename);
+            
+            // Web3Forms and other email providers also look for 'attachment' fields
             const fieldName = index === 0 ? 'attachment' : `attachment_${index + 1}`;
-            formData.append(fieldName, blob, `photo_${index + 1}.${extension}`);
+            formData.append(fieldName, blob, filename);
           }
         });
       }
@@ -546,6 +551,23 @@ Référence de suivi : ${newQuote.id}
     setNewReviewRating(5);
     setReviewSuccessMessage(true);
     setTimeout(() => setReviewSuccessMessage(false), 4000);
+  };
+
+  const handleAddNewReview = (newReview: { name: string; text: string; rating: number; location: string; serviceType: string }) => {
+    const added = {
+      id: 'rev-' + Date.now(),
+      name: newReview.name,
+      location: newReview.location || 'Gironde',
+      role: 'Client Particulier',
+      rating: newReview.rating,
+      text: newReview.text,
+      date: 'Aujourd\'hui',
+      serviceType: newReview.serviceType
+    };
+
+    const newSet = [added, ...reviews];
+    localStorage.setItem('debarras_reviews', JSON.stringify(newSet));
+    setReviews(newSet);
   };
 
   // Business hours active indicator
@@ -1049,6 +1071,8 @@ Référence de suivi : ${newQuote.id}
               </ScrollReveal>
             </div>
           </motion.section>
+
+
 
           {/* Section cartographique interactive de la zone d'intervention */}
           <motion.div
@@ -1655,6 +1679,62 @@ Référence de suivi : ${newQuote.id}
         <SitemapTextuel setCurrentPage={setCurrentPage} setActiveModal={setActiveModal} />
       </React.Suspense>
 
+      {/* Section Zones d'Intervention Détaillées pour l'optimisation du maillage local / SEO */}
+      <div className="bg-slate-900 pb-12 pt-2 px-4 sm:px-6 lg:px-8 border-t border-slate-850">
+        <div className="max-w-7xl mx-auto border-t border-slate-800/65 pt-6">
+          <button
+            onClick={() => setIsZonesExpanded(!isZonesExpanded)}
+            className="flex items-center gap-2 text-slate-450 hover:text-slate-200 transition text-[11px] font-extrabold uppercase tracking-wider cursor-pointer"
+          >
+            <span>Zones d'Intervention Détaillées</span>
+            {isZonesExpanded ? <ChevronUp className="w-3.5 h-3.5 text-emerald-400" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-500" />}
+          </button>
+          
+          <AnimatePresence>
+            {isZonesExpanded && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                className="overflow-hidden"
+              >
+                <div className="pt-4 space-y-3.5">
+                  <p className="text-[10px] text-slate-500 leading-relaxed font-semibold">
+                    AlloServices33 intervient rapidement pour vos débarras, déménagements et nettoyages professionnels dans l'ensemble de la métropole bordelaise et de la Gironde (33). Retrouvez ci-dessous la liste détaillée de nos secteurs d'activité :
+                  </p>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-3 gap-y-2 text-[10px] text-slate-400 font-semibold">
+                    {[
+                      "Bordeaux Centre (33000)", "Mérignac (33700)", "Pessac (33600)", "Talence (33400)", "Villenave-d'Ornon (33140)", 
+                      "Saint-Médard-en-Jalles (33160)", "Bègles (33130)", "Gradignan (33170)", "Cenon (33150)", "Libourne (33500)", 
+                      "Lormont (33310)", "Le Bouscat (33110)", "Eysines (33320)", "Floirac (33270)", "Cestas (33610)", "Blanquefort (33290)", 
+                      "Bruges (33520)", "Ambarès-et-Lagrave (33440)", "La Teste-de-Buch (33260)", "Gujan-Mestras (33470)", 
+                      "Arcachon (33120)", "Andernos-les-Bains (33510)", "Le Haillan (33185)", "Parempuyre (33290)", 
+                      "Martignas-sur-Jalle (33127)", "Taillan-Médoc (33320)", "Saint-Loubès (33450)", "Artigues-près-Bordeaux (33370)", 
+                      "Carbon-Blanc (33560)", "Sainte-Eulalie (33560)", "Saint-Jean-d'Illac (33127)", "Le Pian-Médoc (33290)"
+                    ].map((city) => (
+                      <a
+                        key={city}
+                        href="/"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setCurrentPage('accueil');
+                          window.scrollTo({ top: 0, behavior: 'smooth' });
+                        }}
+                        className="hover:text-emerald-400 hover:underline transition-all block py-0.5 truncate"
+                        title={`Service de débarras et déménagement à ${city}`}
+                      >
+                        Débarras {city}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+
       {/* Schema.org JSON-LD Structured Data for LocalBusiness SEO */}
       <script
         type="application/ld+json"
@@ -1662,7 +1742,7 @@ Référence de suivi : ${newQuote.id}
           __html: JSON.stringify({
             "@context": "https://schema.org",
             "@type": "LocalBusiness",
-            "name": "Damien Pommier - Débarras, Encombrants & Déménagement Gironde",
+            "name": "AlloServices33 - Débarras, Encombrants & Déménagement Gironde",
             "image": "https://images.unsplash.com/photo-1600513524458-297ba52937ae?auto=format&fit=crop&q=80&w=800",
             "@id": "https://damien-pommier-debarras.fr/#localbusiness",
             "url": "https://damien-pommier-debarras.fr",
@@ -1721,7 +1801,7 @@ Référence de suivi : ${newQuote.id}
                 "name": "Quels sont vos secteurs et communes d'intervention autour de Bordeaux et en Gironde ?",
                 "acceptedAnswer": {
                   "@type": "Answer",
-                  "text": "Damien Pommier intervient rapidement (sous 24h à 48h) dans toutes les villes dans un rayon de 50km autour de Bordeaux et plus généralement dans l'ensemble du département de la Gironde (33). Les principales communes desservies comprennent : Bordeaux, Mérignac, Pessac, Talence, Villenave-d'Ornon, Saint-Médard-en-Jalles, Bègles, Cenon, Gradignan, Lormont, Eysines, Cestas, Floirac, Blanquefort, Bruges, Ambarès-et-Lagrave, Le Bouscat, Léognan, Saint-André-de-Cubzac, Libourne, Gujan-Mestras, Castelnau-de-Médoc, Créon, Saint-Jean-d'Illac, Martignas-sur-Jalle, Canéjan, Carbon-Blanc, Bassens, Saint-Loubès, Artigues-près-Bordeaux, Parempuyre, Le Taillan-Médoc, Saint-Aubin-de-Médoc, Ludon-Médoc, Macau, Langon, Cadillac, Podensac, Portets, Saint-Sulpice-et-Cameyrac, Bouliac, Latresne, Fargues-Saint-Hilaire, Sadirac, Carignan-de-Bordeaux, Blaye, Saint-Émilion, Izon, Saint-Denis-de-Pile, Coutras, Biganos, Audenge, Lanton, Andernos-les-Bains, Marcheprime, Salles, Belin-Béliet, Saint-Selve, La Brède, Martillac, Beautiran, Castres-Gironde, Arsac, Pian-Médoc, Saucats, Le Barp, Tresses, Yvrac, Cénac, Camblanes-et-Meynac, Quinsac, Saint-Caprais-de-Bordeaux, Lignan-de-Bordeaux, Sainte-Eulalie, Montussan, Beychac-et-Caillau, Vayres, Arveyres, Fronsac, Saint-Germain-du-Puch, Baron, Nérigean... Nous nous déplaçons gratuitement pour évaluer le volume à vider et vous proposer un devis personnalisé."
+                  "text": "Damien Pommier intervient rapidement (sous 24h à 48h) dans toutes les villes dans un rayon de 50km autour de Bordeaux et plus généralement dans l'ensemble du département de la Gironde (33). Les principales communes desservies comprennent : Bordeaux (33000), Mérignac (33700), Pessac (33600), Talence (33400), Villenave-d'Ornon (33140), Saint-Médard-en-Jalles (33160), Bègles (33130), Cenon (33150), Gradignan (33170), Lormont (33310), Eysines (33320), Cestas (33610), Floirac (33270), Blanquefort (33290), Bruges (33520), Ambarès-et-Lagrave (33440), Le Bouscat (33110), Léognan (33850), Saint-André-de-Cubzac (33240), Libourne (33500), Gujan-Mestras (33470), Castelnau-de-Médoc (33480), Créon (33670), Saint-Jean-d'Illac (33127), Martignas-sur-Jalle (33127), Canéjan (33610), Carbon-Blanc (33560), Bassens (33530), Saint-Loubès (33450), Artigues-près-Bordeaux (33370), Parempuyre (33290), Le Taillan-Médoc (33320), Saint-Aubin-de-Médoc (33160), Ludon-Médoc (33290), Macau (33460), Langon (33210), Cadillac (33410), Podensac (33720), Portets (33640), Saint-Sulpice-et-Cameyrac (33450), Bouliac (33270), Latresne (33360), Fargues-Saint-Hilaire (33370), Sadirac (33670), Carignan-de-Bordeaux (33360), Blaye (33390), Saint-Émilion (33330), Izon (33240), Saint-Denis-de-Pile (33910), Coutras (33230), Biganos (33380), Audenge (33980), Lanton (33138), Andernos-les-Bains (33510), Marcheprime (33380), Salles (33770), Belin-Béliet (33830), Saint-Selve (33650), La Brède (33650), Martillac (33650), Beautiran (33640), Castres-Gironde (33640), Arsac (33460), Le Pian-Médoc (33290), Saucats (33650), Le Barp (33114), Tresses (33370), Yvrac (33370), Cénac (33360), Camblanes-et-Meynac (33360), Quinsac (33360), Saint-Caprais-de-Bordeaux (33880), Lignan-de-Bordeaux (33360), Sainte-Eulalie (33560), Montussan (33450), Beychac-et-Caillau (33750), Vayres (33870), Arveyres (33500), Fronsac (33126), Saint-Germain-du-Puch (33750), Baron (33750), Nérigean (33750)... Nous nous déplaçons gratuitement pour évaluer le volume à vider et vous proposer un devis personnalisé."
                 }
               },
               {
@@ -1787,11 +1867,11 @@ Référence de suivi : ${newQuote.id}
               >
                 <img
                   src={humanPhoto}
-                  alt="Logo Damien Pommier"
+                  alt="Logo AlloServices33"
                   className="w-14 h-14 object-cover rounded-xl shadow-md border border-emerald-500/10"
                   referrerPolicy="no-referrer"
                 />
-                <span className="font-display font-black text-slate-100 text-lg tracking-tight">Damien Pommier</span>
+                <span className="font-display font-black text-slate-100 text-lg tracking-tight">AlloServices33</span>
               </button>
               <p className="text-slate-500 text-xs leading-relaxed max-w-sm font-semibold">
                 Spécialiste de l'enlèvement des encombrants.
@@ -1942,63 +2022,9 @@ Référence de suivi : ${newQuote.id}
 
           </div>
 
-          {/* Section Zones d'Intervention Détaillées pour l'optimisation du maillage local / SEO */}
-          <div className="mt-8 border-t border-slate-800/80 pt-6">
-            <button
-              onClick={() => setIsZonesExpanded(!isZonesExpanded)}
-              className="flex items-center gap-2 text-slate-450 hover:text-slate-200 transition text-[11px] font-extrabold uppercase tracking-wider cursor-pointer"
-            >
-              <span>Zones d'Intervention Détaillées</span>
-              {isZonesExpanded ? <ChevronUp className="w-3.5 h-3.5 text-emerald-400" /> : <ChevronDown className="w-3.5 h-3.5 text-slate-500" />}
-            </button>
-            
-            <AnimatePresence>
-              {isZonesExpanded && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: 'auto' }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                  className="overflow-hidden"
-                >
-                  <div className="pt-4 space-y-3.5">
-                    <p className="text-[10px] text-slate-500 leading-relaxed font-semibold">
-                      Damien Pommier intervient rapidement pour vos débarras, déménagements et nettoyages professionnels dans l'ensemble de la métropole bordelaise et de la Gironde (33). Retrouvez ci-dessous la liste détaillée de nos secteurs d'activité :
-                    </p>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-3 gap-y-2 text-[10px] text-slate-400 font-semibold">
-                      {[
-                        "Bordeaux Centre", "Mérignac", "Pessac", "Talence", "Villenave-d'Ornon", 
-                        "Saint-Médard-en-Jalles", "Bègles", "Gradignan", "Cenon", "Libourne", 
-                        "Lormont", "Le Bouscat", "Eysines", "Floirac", "Cestas", "Blanquefort", 
-                        "Bruges", "Ambarès-et-Lagrave", "La Teste-de-Buch", "Gujan-Mestras", 
-                        "Arcachon", "Andernos-les-Bains", "Le Haillan", "Parempuyre", 
-                        "Martignas-sur-Jalle", "Taillan-Médoc", "Saint-Loubès", "Artigues-près-Bordeaux", 
-                        "Carbon-Blanc", "Sainte-Eulalie", "Saint-Jean-d'Illac", "Le Pian-Médoc"
-                      ].map((city) => (
-                        <a
-                          key={city}
-                          href="/"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            setCurrentPage('accueil');
-                            window.scrollTo({ top: 0, behavior: 'smooth' });
-                          }}
-                          className="hover:text-emerald-400 hover:underline transition-all block py-0.5 truncate"
-                          title={`Service de débarras et déménagement à ${city}`}
-                        >
-                          Débarras {city}
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-
           <div className="pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-slate-600 text-[11px] font-semibold">
             <div>
-              &copy; {new Date().getFullYear()} Damien Pommier. Tous droits réservés.
+              &copy; {new Date().getFullYear()} AlloServices33. Tous droits réservés.
             </div>
             <div className="flex items-center gap-6">
               <button onClick={() => setActiveModal('legals')} className="hover:text-emerald-400 transition cursor-pointer">Mentions Légales</button>

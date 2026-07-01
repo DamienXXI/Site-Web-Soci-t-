@@ -18,6 +18,76 @@ const API_KEY =
   '';
 const hasValidKey = Boolean(API_KEY) && API_KEY !== 'YOUR_API_KEY' && API_KEY.trim() !== '';
 
+const RAW_GIRONDE_CITIES = [
+  { name: 'Ambarès-et-Lagrave', distance: 17, desc: 'Rive Droite / Bordeaux Métropole', lat: 44.9258, lng: -0.4851 },
+  { name: 'Andernos-les-Bains', distance: 47, desc: 'Bassin d’Arcachon Nord', lat: 44.7436, lng: -1.0964 },
+  { name: 'Arcachon', distance: 65, desc: 'Bassin d’Arcachon', lat: 44.6586, lng: -1.1648 },
+  { name: 'Artigues-près-Bordeaux', distance: 10, desc: 'Entre-deux-Mers / Métropole', lat: 44.8601, lng: -0.4965 },
+  { name: 'Audenge', distance: 49, desc: 'Bassin d’Arcachon Est', lat: 44.6853, lng: -1.0134 },
+  { name: 'Bassens', distance: 10, desc: 'Rive Droite / Portuaire', lat: 44.9044, lng: -0.5212 },
+  { name: 'Bègles', distance: 5, desc: 'Bordeaux Métropole Sud', lat: 44.8078, lng: -0.5489 },
+  { name: 'Belin-Béliet', distance: 49, desc: 'Val de l’Eyre / Sud-Gironde', lat: 44.4981, lng: -0.7891 },
+  { name: 'Blanquefort', distance: 12, desc: 'Portes du Médoc', lat: 44.9102, lng: -0.6378 },
+  { name: 'Blaye', distance: 45, desc: 'Haute-Gironde / Citadelle', lat: 45.1278, lng: -0.6627 },
+  { name: 'Bordeaux (Centre)', distance: 0, desc: 'Centre-ville et CUB proche', lat: 44.837789, lng: -0.57918 },
+  { name: 'Bouliac', distance: 8, desc: 'Hauteurs de la Rive Droite', lat: 44.8139, lng: -0.5053 },
+  { name: 'Bruges', distance: 6, desc: 'Bordeaux Métropole Nord', lat: 44.8819, lng: -0.6128 },
+  { name: 'Cadaujac', distance: 14, desc: 'Graves / Bordeaux Sud', lat: 44.7554, lng: -0.5284 },
+  { name: 'Cadillac', distance: 35, desc: 'Entre-deux-Mers / Garonne', lat: 44.6402, lng: -0.3195 },
+  { name: 'Canéjan', distance: 14, desc: 'Graves / Pessac-Léognan', lat: 44.7644, lng: -0.6558 },
+  { name: 'Carbon-Blanc', distance: 12, desc: 'Rive Droite Métropole', lat: 44.8953, lng: -0.5065 },
+  { name: 'Carignan-de-Bordeaux', distance: 12, desc: 'Entre-deux-Mers Coteaux', lat: 44.8115, lng: -0.4539 },
+  { name: 'Castelnau-de-Médoc', distance: 30, desc: 'Médoc / Vignobles', lat: 45.0267, lng: -0.7989 },
+  { name: 'Cestas', distance: 18, desc: 'Graves / Landes de Gascogne', lat: 44.7441, lng: -0.6818 },
+  { name: 'Coutras', distance: 52, desc: 'Nord-Libournais', lat: 45.0415, lng: -0.1287 },
+  { name: 'Créon', distance: 25, desc: 'Cœur de l’Entre-deux-Mers', lat: 44.7845, lng: -0.3478 },
+  { name: 'Eysines', distance: 9, desc: 'Bordeaux Métropole Ouest', lat: 44.8841, lng: -0.6501 },
+  { name: 'Fargues-Saint-Hilaire', distance: 11, desc: 'Portes de l’Entre-deux-Mers', lat: 44.8251, lng: -0.4449 },
+  { name: 'Floirac', distance: 6, desc: 'Rive Droite / Arena', lat: 44.8368, lng: -0.5262 },
+  { name: 'Gradignan', distance: 10, desc: 'Graves / Campus', lat: 44.7719, lng: -0.6171 },
+  { name: 'Gujan-Mestras', distance: 55, desc: 'Bassin d’Arcachon / Ports', lat: 44.6362, lng: -1.0689 },
+  { name: 'Izon', distance: 22, desc: 'Vignoble de Saint-Émilion', lat: 44.9202, lng: -0.3621 },
+  { name: 'La Brède', distance: 20, desc: 'Château de Montesquieu', lat: 44.6811, lng: -0.5289 },
+  { name: 'La Teste-de-Buch', distance: 60, desc: 'Dune du Pilat / Bassin', lat: 44.6289, lng: -1.1448 },
+  { name: 'Lacanau-Océan', distance: 55, desc: 'Littoral et lacs médocains', lat: 45.0006, lng: -1.1983 },
+  { name: 'Langon', distance: 48, desc: 'Sud-Gironde / Graves', lat: 44.5518, lng: -0.2452 },
+  { name: 'Lanton', distance: 45, desc: 'Bassin d’Arcachon Nord-Est', lat: 44.7042, lng: -1.1158 },
+  { name: 'Latresne', distance: 10, desc: 'Portes de l’Entre-deux-Mers', lat: 44.7848, lng: -0.4965 },
+  { name: 'Le Barp', distance: 35, desc: 'Val de l’Eyre', lat: 44.6041, lng: -0.7678 },
+  { name: 'Le Bouscat', distance: 4, desc: 'Première couronne Nord-Ouest', lat: 44.8648, lng: -0.5989 },
+  { name: 'Le Haillan', distance: 10, desc: 'Bordeaux Métropole Ouest', lat: 44.8719, lng: -0.6789 },
+  { name: 'Le Pian-Médoc', distance: 20, desc: 'Portes du Médoc', lat: 44.9578, lng: -0.6812 },
+  { name: 'Le Taillan-Médoc', distance: 14, desc: 'Forêt médocaine', lat: 44.9048, lng: -0.6698 },
+  { name: 'Léognan', distance: 15, desc: 'Graves / Bordeaux Sud', lat: 44.7317, lng: -0.5997 },
+  { name: 'Lesparre-Médoc', distance: 75, desc: 'Nord-Médoc', lat: 45.3069, lng: -0.9382 },
+  { name: 'Libourne', distance: 32, desc: 'Confluent Isle et Dordogne', lat: 44.9149, lng: -0.2435 },
+  { name: 'Lormont', distance: 8, desc: 'Rive Droite Pont d’Aquitaine', lat: 44.8784, lng: -0.5235 },
+  { name: 'Ludon-Médoc', distance: 18, desc: 'Médoc / Châteaux', lat: 44.9781, lng: -0.6012 },
+  { name: 'Macau', distance: 22, desc: 'Médoc / Estuaire', lat: 45.0089, lng: -0.6125 },
+  { name: 'Marcheprime', distance: 38, desc: 'Entre Métropole et Bassin', lat: 44.6912, lng: -0.8554 },
+  { name: 'Martignas-sur-Jalle', distance: 18, desc: 'Proche Aéroport Mérignac', lat: 44.8402, lng: -0.7761 },
+  { name: 'Mérignac / Pessac / Bègles', distance: 8, desc: 'Première couronne bordelaise', lat: 44.83, lng: -0.65 },
+  { name: 'Mios', distance: 42, desc: 'Val de l’Eyre', lat: 44.6045, lng: -0.9332 },
+  { name: 'Montussan', distance: 15, desc: 'Entre-deux-Mers / RN89', lat: 44.8812, lng: -0.4285 },
+  { name: 'Parempuyre', distance: 15, desc: 'Bordeaux Métropole Nord', lat: 44.9492, lng: -0.6052 },
+  { name: 'Podensac', distance: 32, desc: 'Graves / Vallée Garonne', lat: 44.6515, lng: -0.3541 },
+  { name: 'Sadirac', distance: 22, desc: 'Entre-deux-Mers Poteries', lat: 44.7825, lng: -0.4121 },
+  { name: 'Salles', distance: 48, desc: 'Val de l’Eyre Landes', lat: 44.5501, lng: -0.8698 },
+  { name: 'Saint-André-de-Cubzac', distance: 28, desc: 'Nord-Gironde / Cubzaguais', lat: 44.9951, lng: -0.4445 },
+  { name: 'Saint-Aubin-de-Médoc', distance: 16, desc: 'Bordeaux Métropole Ouest', lat: 44.9122, lng: -0.7312 },
+  { name: 'Saint-Émilion', distance: 42, desc: 'Vignoble et Grand-Libournais', lat: 44.8937, lng: -0.1557 },
+  { name: 'Saint-Jean-d\'Illac', distance: 18, desc: 'Forêt et Métropole Ouest', lat: 44.8105, lng: -0.7818 },
+  { name: 'Saint-Loubès', distance: 16, desc: 'Presqu’île d’Ambès', lat: 44.9171, lng: -0.4285 },
+  { name: 'Saint-Médard-en-Jalles', distance: 15, desc: 'Aérospatiale / Métropole', lat: 44.8965, lng: -0.7182 },
+  { name: 'Saint-Sulpice-et-Cameyrac', distance: 20, desc: 'Entre-deux-Mers', lat: 44.9102, lng: -0.3854 },
+  { name: 'Sainte-Eulalie', distance: 15, desc: 'Rive Droite Métropole', lat: 44.9048, lng: -0.4721 },
+  { name: 'Saucats', distance: 25, desc: 'Graves / Forêt landaise', lat: 44.6515, lng: -0.5989 },
+  { name: 'Talence', distance: 5, desc: 'Bordeaux Métropole Sud', lat: 44.8012, lng: -0.5915 },
+  { name: 'Tresses', distance: 11, desc: 'Coteaux bordelais', lat: 44.8475, lng: -0.4632 },
+  { name: 'Vayres', distance: 24, desc: 'Libournais / Château', lat: 44.8965, lng: -0.3185 },
+  { name: 'Villenave-d\'Ornon', distance: 10, desc: 'Bordeaux Métropole Sud', lat: 44.7736, lng: -0.5615 }
+];
+
 function ServiceAreaCircle({ center, radius }: { center: { lat: number; lng: number }; radius: number }) {
   const map = useMap();
   const circleRef = useRef<google.maps.Circle | null>(null);
@@ -80,9 +150,33 @@ export default function InterventionZoneMap() {
     { name: 'Lesparre-Médoc', distance: 75, desc: 'Nord-Médoc', x: 160, y: 145, lat: 45.3069, lng: -0.9382 },
   ], []);
 
+  const girondeAllCities: City[] = useMemo(() => {
+    return RAW_GIRONDE_CITIES.map(city => {
+      const dx = city.lng - (-0.57918);
+      const dy = city.lat - 44.837789;
+      return {
+        ...city,
+        x: Math.round(240 + dx * 146),
+        y: Math.round(240 + dy * -214)
+      };
+    });
+  }, []);
+
   const selectedCity = useMemo(() => {
-    return cities.find(c => c.name === selectedCityName) || cities[0];
-  }, [cities, selectedCityName]);
+    return girondeAllCities.find(c => c.name === selectedCityName) || cities.find(c => c.name === selectedCityName) || cities[0];
+  }, [girondeAllCities, selectedCityName, cities]);
+
+  const activeCitiesList = useMemo(() => {
+    const list = [...cities];
+    const exists = list.some(c => c.name === selectedCityName);
+    if (!exists) {
+      const found = girondeAllCities.find(c => c.name === selectedCityName);
+      if (found) {
+        list.push(found);
+      }
+    }
+    return list;
+  }, [cities, selectedCityName, girondeAllCities]);
 
   // Quick select a city
   const handleSelectCity = (city: City) => {
@@ -243,28 +337,61 @@ export default function InterventionZoneMap() {
             </div>
 
             {/* Quick Cities Finder Panel */}
-            <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl space-y-3">
-              <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-400 flex items-center gap-1.5 font-sans">
-                📌 Villes de la zone & distances :
-              </h4>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {cities.map((city) => {
-                  const isActive = selectedCityName === city.name || (city.distance === 0 && distance === 0);
-                  return (
-                    <button
-                      key={city.name}
-                      onClick={() => handleSelectCity(city)}
-                      className={`p-2.5 text-left rounded-xl transition duration-150 border cursor-pointer text-xs flex flex-col justify-between ${
-                        isActive
-                           ? 'bg-emerald-500/10 border-emerald-500 text-white shadow-md'
-                           : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-250'
-                      }`}
-                    >
-                      <span className="font-bold block truncate">{city.name}</span>
-                      <span className="text-[9px] text-emerald-400 font-extrabold mt-1 font-mono">{city.distance} km</span>
-                    </button>
-                  );
-                })}
+            <div className="bg-slate-900/40 border border-slate-800 p-6 rounded-3xl space-y-4">
+              <div className="space-y-2">
+                <h4 className="text-xs font-extrabold uppercase tracking-widest text-slate-450 flex items-center gap-1.5 font-sans">
+                  🗺️ Toutes les villes de Gironde (A-Z) :
+                </h4>
+                <div className="relative">
+                  <select
+                    value={girondeAllCities.some(c => c.name === selectedCityName) ? selectedCityName : ""}
+                    onChange={(e) => {
+                      const found = girondeAllCities.find(c => c.name === e.target.value);
+                      if (found) {
+                        setSelectedCityName(found.name);
+                        setDistance(found.distance);
+                      }
+                    }}
+                    className="w-full bg-slate-950/80 border border-slate-850 hover:border-slate-700 text-slate-200 rounded-xl py-3 px-4 text-xs font-bold focus:outline-none focus:ring-1 focus:ring-emerald-500 focus:border-emerald-500 transition-colors appearance-none cursor-pointer"
+                  >
+                    <option value="" disabled>-- Sélectionner une commune de Gironde --</option>
+                    {girondeAllCities.map((city) => (
+                      <option key={city.name} value={city.name} className="bg-slate-950 text-slate-300">
+                        {city.name} ({city.distance} km)
+                      </option>
+                    ))}
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-slate-400">
+                    <svg className="fill-current h-4 w-4 text-emerald-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+                      <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <h4 className="text-[11px] font-bold uppercase tracking-wider text-slate-400/85 flex items-center gap-1.5 font-sans">
+                  📌 Exemples de villes clés :
+                </h4>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  {cities.map((city) => {
+                    const isActive = selectedCityName === city.name || (city.distance === 0 && distance === 0);
+                    return (
+                      <button
+                        key={city.name}
+                        onClick={() => handleSelectCity(city)}
+                        className={`p-2.5 text-left rounded-xl transition duration-150 border cursor-pointer text-xs flex flex-col justify-between ${
+                          isActive
+                             ? 'bg-emerald-500/10 border-emerald-500 text-white shadow-md'
+                             : 'bg-slate-950/40 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-250'
+                        }`}
+                      >
+                        <span className="font-bold block truncate">{city.name}</span>
+                        <span className="text-[9px] text-emerald-400 font-extrabold mt-1 font-mono">{city.distance} km</span>
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           </div>
@@ -406,7 +533,7 @@ export default function InterventionZoneMap() {
                   </div>
 
                   {/* Absolute Placement of Cities Buttons to overlay geography perfectly */}
-                  {cities.map((city) => {
+                  {activeCitiesList.map((city) => {
                     if (city.distance === 0) return null;
 
                     const isSelected = selectedCityName === city.name;
@@ -493,7 +620,7 @@ export default function InterventionZoneMap() {
                         />
 
                         {/* All coverage markers */}
-                        {cities.map((city) => {
+                        {activeCitiesList.map((city) => {
                           const isSelected = selectedCityName === city.name;
                           const isInRadius = city.distance <= distance;
                           return (
@@ -600,7 +727,7 @@ export default function InterventionZoneMap() {
           </p>
           <div className="flex flex-wrap gap-1.5 text-[10px] text-slate-300 font-sans font-bold">
             {[
-              "Bordeaux", "Mérignac", "Pessac", "Talence", "Villenave-d'Ornon", "Saint-Médard-en-Jalles", "Bègles", "Cenon", "Gradignan", "Lormont", "Eysines", "Cestas", "Floirac", "Blanquefort", "Bruges", "Ambarès-et-Lagrave", "Le Bouscat", "Léognan", "Saint-André-de-Cubzac", "Libourne", "Gujan-Mestras", "Castelnau-de-Médoc", "Créon", "Saint-Jean-d'Illac", "Martignas-sur-Jalle", "Canéjan", "Carbon-Blanc", "Bassens", "Saint-Loubès", "Artigues-près-Bordeaux", "Parempuyre", "Le Taillan-Médoc", "Saint-Aubin-de-Médoc", "Ludon-Médoc", "Macau", "Langon", "Cadillac", "Podensac", "Portets", "Saint-Sulpice-et-Cameyrac", "Bouliac", "Latresne", "Fargues-Saint-Hilaire", "Sadirac", "Carignan-de-Bordeaux", "Blaye", "Saint-Émilion", "Izon", "Saint-Denis-de-Pile", "Coutras", "Biganos", "Audenge", "Lanton", "Andernos-les-Bains", "Marcheprime", "Salles", "Belin-Béliet", "Saint-Selve", "La Brède", "Martillac", "Beautiran", "Castres-Gironde", "Arsac", "Pian-Médoc", "Saucats", "Le Barp", "Tresses", "Yvrac", "Cénac", "Camblanes-et-Meynac", "Quinsac", "Saint-Caprais-de-Bordeaux", "Lignan-de-Bordeaux", "Sainte-Eulalie", "Montussan", "Beychac-et-Caillau", "Vayres", "Arveyres", "Fronsac", "Saint-Germain-du-Puch", "Baron", "Nérigean"
+              "Bordeaux (33000)", "Mérignac (33700)", "Pessac (33600)", "Talence (33400)", "Villenave-d'Ornon (33140)", "Saint-Médard-en-Jalles (33160)", "Bègles (33130)", "Cenon (33150)", "Gradignan (33170)", "Lormont (33310)", "Eysines (33320)", "Cestas (33610)", "Floirac (33270)", "Blanquefort (33290)", "Bruges (33520)", "Ambarès-et-Lagrave (33440)", "Le Bouscat (33110)", "Léognan (33850)", "Saint-André-de-Cubzac (33240)", "Libourne (33500)", "Gujan-Mestras (33470)", "Castelnau-de-Médoc (33480)", "Créon (33670)", "Saint-Jean-d'Illac (33127)", "Martignas-sur-Jalle (33127)", "Canéjan (33610)", "Carbon-Blanc (33560)", "Bassens (33530)", "Saint-Loubès (33450)", "Artigues-près-Bordeaux (33370)", "Parempuyre (33290)", "Le Taillan-Médoc (33320)", "Saint-Aubin-de-Médoc (33160)", "Ludon-Médoc (33290)", "Macau (33460)", "Langon (33210)", "Cadillac (33410)", "Podensac (33720)", "Portets (33640)", "Saint-Sulpice-et-Cameyrac (33450)", "Bouliac (33270)", "Latresne (33360)", "Fargues-Saint-Hilaire (33370)", "Sadirac (33670)", "Carignan-de-Bordeaux (33360)", "Blaye (33390)", "Saint-Émilion (33330)", "Izon (33240)", "Saint-Denis-de-Pile (33910)", "Coutras (33230)", "Biganos (33380)", "Audenge (33980)", "Lanton (33138)", "Andernos-les-Bains (33510)", "Marcheprime (33380)", "Salles (33770)", "Belin-Béliet (33830)", "Saint-Selve (33650)", "La Brède (33650)", "Martillac (33650)", "Beautiran (33640)", "Castres-Gironde (33640)", "Arsac (33460)", "Le Pian-Médoc (33290)", "Saucats (33650)", "Le Barp (33114)", "Tresses (33370)", "Yvrac (33370)", "Cénac (33360)", "Camblanes-et-Meynac (33360)", "Quinsac (33360)", "Saint-Caprais-de-Bordeaux (33880)", "Lignan-de-Bordeaux (33360)", "Sainte-Eulalie (33560)", "Montussan (33450)", "Beychac-et-Caillau (33750)", "Vayres (33870)", "Arveyres (33500)", "Fronsac (33126)", "Saint-Germain-du-Puch (33750)", "Baron (33750)", "Nérigean (33750)"
             ].map((city, cIdx) => (
               <span key={cIdx} className="px-2.5 py-1 bg-slate-950/50 border border-slate-800 rounded-lg hover:border-emerald-500/40 hover:text-white transition duration-150">
                 {city}

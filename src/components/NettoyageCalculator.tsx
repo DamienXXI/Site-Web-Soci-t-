@@ -214,12 +214,13 @@ export default function NettoyageCalculator({ onQuoteRequest }: NettoyageCalcula
             <p className="text-slate-400 text-[10px] font-extrabold uppercase tracking-widest font-sans">
               Cout D'intervention estimé :
             </p>
-            <div className="flex items-baseline gap-2 mt-1">
+            <div className="flex flex-wrap items-baseline gap-2 mt-1">
               <span className="text-3xl md:text-4xl font-black text-emerald-400 font-display">
                 {totalNettoyagePrice} €
               </span>
               <span className="text-slate-400 text-xs sm:text-sm font-semibold font-sans">à {Math.round(totalNettoyagePrice * 1.15)} €</span>
-              <span className="text-[10px] text-slate-500 italic font-bold">HT</span>
+              <span className="text-[10px] text-slate-500 font-extrabold uppercase tracking-wider">HT</span>
+              <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800">Non soumis à la TVA</span>
             </div>
             <p className="text-[10px] text-slate-400 mt-1 italic leading-relaxed font-medium font-sans">
               *Une visite d'évaluation physique ou par photos est toujours effectuée avant validation définitive du devis. Le devis final sera validé par Damien après examen logistique.

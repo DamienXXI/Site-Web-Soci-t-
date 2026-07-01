@@ -331,7 +331,7 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
         hasElevator,
         parkingDistance,
         additionalDetails: additionalDetails + customItemsDetails,
-        estimatedPrice: `${priceRange.min} € HT`,
+        estimatedPrice: `${priceRange.min} € HT (Non soumis à la TVA)`,
         photos,
         createdAt: new Date().toISOString(),
         status: 'pending'
@@ -408,8 +408,9 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
               <div>Accessibilité :</div>
               <div className="font-bold text-slate-900 text-right">Etg {submittedQuote.floor} {submittedQuote.hasElevator ? '(avec asc.)' : '(sans asc.)'}</div>
               <div>Tarif indicatif :</div>
-              <div className="font-extrabold text-emerald-700 text-right text-sm">
+              <div className="font-extrabold text-emerald-700 text-right text-xs">
                 {priceRange.min} € HT *
+                <span className="block text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Non soumis à la TVA</span>
               </div>
             </div>
             {priceRange.isFreePossible && (
@@ -827,13 +828,27 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
           <div className="lg:col-span-5 space-y-6">
             
             {/* Live Volume & Pricing card */}
-            <div className="bg-slate-900/95 backdrop-blur-lg text-white rounded-3xl p-6 md:p-8 shadow-lg relative overflow-hidden border border-white/10">
+            <motion.div
+              key={totalVolume}
+              initial={{ opacity: 0.7, scale: 0.99 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="bg-slate-900/95 backdrop-blur-lg text-white rounded-3xl p-6 md:p-8 shadow-lg relative overflow-hidden border border-white/10"
+            >
               <div className="absolute top-0 right-0 w-32 h-32 bg-emerald-500/10 rounded-full blur-2xl pointer-events-none"></div>
               
               <div className="flex items-center justify-between mb-4">
                 <span className="text-slate-400 text-xs font-semibold uppercase tracking-wider">Volume total accumulé</span>
-                <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-extrabold font-mono">
-                  {totalVolume} m³
+                <span className="px-3 py-1 bg-emerald-500/20 text-emerald-400 rounded-full text-xs font-extrabold font-mono flex items-center">
+                  <motion.span
+                    key={totalVolume}
+                    initial={{ opacity: 0.3, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {totalVolume}
+                  </motion.span>
+                  <span className="ml-1">m³</span>
                 </span>
               </div>
 
@@ -845,30 +860,39 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
                 ></div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 border-t border-slate-800 pt-4">
-                <div>
-                  <span className="text-slate-450 text-[10px] md:text-xs uppercase font-bold tracking-wider">Tarif indicatif HT *</span>
-                  <div className="text-xl md:text-2xl font-black text-emerald-400 font-mono mt-0.5">
-                    {totalVolume > 0 ? `${priceRange.min} €` : '0,00 €'}
+              <div className="border-t border-slate-800 pt-4">
+                <div className="flex flex-col sm:flex-row justify-between items-baseline gap-2">
+                  <div>
+                    <span className="text-slate-450 text-[10px] md:text-xs uppercase font-bold tracking-wider">Tarif indicatif HT *</span>
+                    <div className="text-2xl md:text-3xl font-black text-emerald-400 font-mono mt-0.5">
+                      <motion.span
+                        key={priceRange.min}
+                        initial={{ opacity: 0.3 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ duration: 0.2 }}
+                        className="inline-block"
+                      >
+                        {totalVolume > 0 ? `${priceRange.min} €` : '0,00 €'}
+                      </motion.span>
+                    </div>
                   </div>
-                </div>
-                <div className="text-right">
-                  <span className="text-slate-450 text-[10px] md:text-xs uppercase font-bold tracking-wider">Camions requis</span>
-                  <div className="text-sm font-extrabold text-slate-100 mt-1">
-                    {totalVolume <= 0 ? 'Calculateur vide' : totalVolume < 6 ? '1 Fourgon (10m³)' : totalVolume < 18 ? '1 Grand Camion (22m³)' : '2 Camions Pro'}
+                  <div className="text-right sm:text-left self-end">
+                    <span className="text-[10px] text-slate-500 font-extrabold uppercase tracking-widest block bg-slate-900/50 py-1 px-2 rounded-lg border border-slate-800/60">
+                      Non soumis à la TVA
+                    </span>
                   </div>
                 </div>
               </div>
 
               {priceRange.isFreePossible && (
                 <div className="mt-4 p-3 bg-emerald-950/40 border border-emerald-900/30 rounded-2xl flex gap-2 items-start text-xs text-slate-300 leading-normal font-medium">
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5 animate-bounce" />
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
                   <span>
                     <strong className="text-emerald-350">Option de valorisation :</strong> Vos meubles revendables peuvent venir compenser le coût de l'opération !
                   </span>
                 </div>
               )}
-            </div>
+            </motion.div>
             
             <p className="text-[10px] text-slate-500 leading-normal text-right font-sans font-semibold -mt-3 mb-2 px-2">
               Le devis final sera validé par Damien après examen logistique.
@@ -947,7 +971,13 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
                 2. Coordonnées
               </h4>
 
-              <form onSubmit={handleSubmit} className="space-y-3">
+              <form 
+                onSubmit={handleSubmit} 
+                action="https://api.web3forms.com/submit" 
+                method="POST" 
+                encType="multipart/form-data" 
+                className="space-y-3"
+              >
                 <div>
                   <label className="block text-xs font-bold text-slate-600 mb-1">Cadre du débarras</label>
                   <div className="grid grid-cols-2 gap-2">
@@ -1102,6 +1132,7 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
                   >
                     <input
                       type="file"
+                      name="photos_projet"
                       multiple
                       accept="image/*"
                       onChange={handlePhotoUpload}

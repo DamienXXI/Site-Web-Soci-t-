@@ -125,7 +125,7 @@ export function calculateEstimatedPrice(
 ): { min: number; max: number; isFreePossible: boolean } {
   if (volumeM3 <= 0) return { min: 0, max: 0, isFreePossible: false };
 
-  // Le tarif est de 40€ du m3 et 50 de déplacement
+  // Le tarif est de 40€ HT du m3 et 50€ HT de déplacement
   const cost = Math.round(40 * volumeM3 + 50);
 
   return {

@@ -1039,12 +1039,15 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
 
           <div className="space-y-1">
             <div className="flex justify-between items-baseline">
-              <span className="text-sm font-black text-slate-300">Total Estimé TTC</span>
+              <div className="flex flex-col">
+                <span className="text-sm font-black text-slate-300">Total Estimé HT</span>
+                <span className="text-[9px] text-slate-500 font-bold uppercase tracking-wider">Non soumis à la TVA</span>
+              </div>
               <span className="text-2xl md:text-3xl font-black font-display text-emerald-400">
                 {totalEstimatedPrice.toFixed(2)} €
               </span>
             </div>
-            <p className="text-[10px] text-slate-500 leading-normal text-right font-sans font-medium">Le devis final sera validé par Damien après examen logistique.</p>
+            <p className="text-[10px] text-slate-500 leading-normal text-right font-sans font-medium">Le devis final sera validé après examen logistique.</p>
           </div>
         </div>
 
@@ -1068,6 +1071,9 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
             </div>
           ) : (
             <form
+              action="https://api.web3forms.com/submit"
+              method="POST"
+              encType="multipart/form-data"
               onSubmit={(e) => {
                 e.preventDefault();
                 
@@ -1099,7 +1105,7 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                 const durationStr = `${demDuration} jour${Number(demDuration) > 1 ? 's' : ''}`;
                 const detailText = `🚚 Projet Déménagement de ${demDepart}${etapesStr} à ${demArrivee} (${demDistance} km) prévu pour durer ${durationStr}. ` +
                   `Volume : ${parseFloat(totalM3Value.toFixed(3))} m³ (${demCartons} cartons, ${demMeubles} meubles, ${demElectro} appareils, ${demLits} lits, ${demTables} tables, ${demPetits} petits meubles, ${demVelos} vélos, ${demDivers} divers${customItemsStr}). ` +
-                  `Prix Estimé : ${totalEstimatedPrice.toFixed(2)}€ TTC. ` +
+                  `Prix Estimé : ${totalEstimatedPrice.toFixed(2)}€ HT (Non soumis à la TVA). ` +
                   `Détails additionnels : ${demMessage}`;
 
                 const newQuote: QuoteRequest = {
@@ -1127,7 +1133,7 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                   hasElevator: true,
                   parkingDistance: 'proche',
                   additionalDetails: detailText,
-                  estimatedPrice: `${totalEstimatedPrice.toFixed(2)} € TTC`,
+                  estimatedPrice: `${totalEstimatedPrice.toFixed(2)} € HT (Non soumis à la TVA)`,
                   photos: demPhotos,
                   createdAt: new Date().toISOString(),
                   status: 'pending'
@@ -1245,6 +1251,7 @@ export default function DemenagementCalculator({ onQuoteSubmitted }: Demenagemen
                 >
                   <input
                     type="file"
+                    name="photos_projet"
                     multiple
                     accept="image/*"
                     onChange={handleDemPhotoUpload}

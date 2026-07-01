@@ -13,6 +13,7 @@ interface Article {
 interface FAQItem {
   question: string;
   answer: string;
+  category?: string;
 }
 
 export default function ConseilsAndFAQ() {
@@ -31,7 +32,7 @@ export default function ConseilsAndFAQ() {
         "2. Marquez clairement ou isolez les meubles et objets que vous souhaitez conserver afin d'éviter toute confusion lors de l'intervention.",
         "3. Facilitez les accès : dégagez les couloirs et signalez les conditions d'accès (hauteur de portail, ascenseur, places de stationnement proches).",
         "4. Triez à l'avance les petits objets par catégories (vaisselle, vêtements, livres) si vous souhaitez participer au tri, ou laissez notre équipe s'en charger de A à Z.",
-        "5. Planifiez l'intervention : convenez d'un rendez-vous clair avec Damien Pommier pour s'assurer que le camion et le matériel adapté soient réservés à votre créneau."
+        "5. Planifiez l'intervention : convenez d'un rendez-vous clair avec AlloServices33 pour s'assurer que le camion et le matériel adapté soient réservés à votre créneau."
       ]
     },
     {
@@ -54,7 +55,7 @@ export default function ConseilsAndFAQ() {
       category: "🌱 Éco-Responsabilité",
       icon: "♻️",
       content: [
-        "Chez Damien Pommier, jeter est le dernier recours. Nous appliquons une politique stricte de valorisation pour chaque m³ de débarras :",
+        "Chez AlloServices33, jeter est le dernier recours. Nous appliquons une politique stricte de valorisation pour chaque m³ de débarras :",
         "• Le don solidaire : Les meubles d'appoint, vêtements, vaisselles et jouets d'enfants en bon état sont livrés gracieusement à des associations caritatives partenaires de la région pour équiper les personnes les plus démunies.",
         "• Le recyclage des matières : Les métaux, cartons, bois de construction et plastiques durs sont rigoureusement séparés puis acheminés vers des centres de tri agréés de Gironde.",
         "• Le traitement réglementé (DEEE) : Les anciens appareils électroménagers et écrans sont déposés dans des filières spécifiques pour être dépollués et recyclés de manière conforme aux normes environnementales."
@@ -64,28 +65,64 @@ export default function ConseilsAndFAQ() {
 
   const faqItems: FAQItem[] = [
     {
+      question: "Quelles sont les étapes clés pour bien préparer un débarras ?",
+      answer: "La préparation idéale se résume en 4 étapes simples : 1. Repérez et mettez de côté vos souvenirs personnels. 2. Faites le tri des papiers importants et administratifs. 3. Identifiez clairement les gros objets ou meubles à évacuer. 4. Facilitez et sécurisez l'accès pour nos véhicules d'enlèvement.",
+      category: "📋 Préparation & Bonnes Pratiques"
+    },
+    {
+      question: "Comment trier et sécuriser mes papiers importants et documents personnels ?",
+      answer: "Le tri des documents est fondamental avant un débarras. Nous vous conseillons de regrouper tous vos classeurs administratifs, papiers d'identité, testaments, contrats et factures dans des boîtes clairement étiquetées 'À CONSERVER' et de les isoler dans une pièce dédiée. De notre côté, nos techniciens ont pour consigne stricte de mettre de côté et de vous remettre immédiatement tout document confidentiel ou administratif suspecté d'être important découvert pendant l'intervention.",
+      category: "📋 Préparation & Bonnes Pratiques"
+    },
+    {
+      question: "Comment s'assurer de la sécurisation des objets de valeur pendant le débarras ?",
+      answer: "Avant l'intervention, réalisez une inspection minutieuse des recoins, tiroirs cachés, placards et doublures de vêtements pour récupérer les petits objets de valeur (bijoux, métaux précieux, argent liquide, clés de rechange ou montres). Conservez-les avec vous. Pendant le débarras, si nos techniciens trouvent le moindre objet de valeur égaré, celui-ci est placé sous scellé temporaire et vous est restitué en main propre.",
+      category: "📋 Préparation & Bonnes Pratiques"
+    },
+    {
+      question: "Comment puis-je indiquer aux équipes les éléments à ne pas débarrasser ?",
+      answer: "Le plus simple est d'appliquer du ruban adhésif de couleur ou des étiquettes autocollantes avec la mention 'À GARDER' sur les meubles et objets concernés. Vous pouvez également regrouper l'ensemble des éléments à conserver dans une pièce fermée à clé ou désignée (par exemple une chambre ou un placard) munie d'une affiche 'NE PAS TOUCHER'.",
+      category: "📋 Préparation & Bonnes Pratiques"
+    },
+    {
+      question: "Comment préparer au mieux mon logement avant l'arrivée des équipes ?",
+      answer: "Pour faciliter l'intervention, nous vous conseillons d'identifier clairement les objets que vous souhaitez conserver (en collant un post-it ou en les regroupant dans une pièce dédiée). Si possible, dégagez les couloirs et accès principaux pour accélérer le portage. Rassurez-vous, nos équipes s'occupent de tout le reste (tri, mise en sac, portage lourd, balayage final).",
+      category: "📋 Préparation & Bonnes Pratiques"
+    },
+    {
+      question: "Dois-je acheter des cartons ou trier les encombrants à l'avance ?",
+      answer: "Non, aucun tri préalable n'est exigé de votre part. Nous venons équipés de tout le matériel de manutention nécessaire : cartons professionnels, sacs ultra-résistants, chariots de portage et bacs de tri. Nous effectuons le tri sélectif directement sur place pour séparer les dons associatifs, le recyclage et les déchets.",
+      category: "🛠️ Logistique & Outils"
+    },
+    {
+      question: "Quelles précautions prenez-vous pour les documents administratifs et objets de valeur ?",
+      answer: "La discrétion est l'une de nos valeurs fondamentales. Avant de vider un meuble ou un carton, nous vérifions systématiquement son contenu. Si nous découvrons des documents officiels récents (impôts, actes de vente), des photos de famille, des bijoux ou des effets personnels, nous les mettons de côté de manière sécurisée pour vous les remettre en fin de journée.",
+      category: "📋 Préparation & Bonnes Pratiques"
+    },
+    {
+      question: "Comment organiser le stationnement et l'accès pour vos camions en Gironde ?",
+      answer: "Si vous résidez dans un centre-ville (comme Bordeaux Centre) ou dans une rue étroite, il est recommandé de réserver une place de stationnement auprès de votre mairie ou de prévenir vos voisins. Nos fourgons ont besoin d'un espace suffisant pour se garer au plus près de l'entrée afin d'optimiser le temps d'intervention et de garantir la sécurité.",
+      category: "🛠️ Logistique & Outils"
+    },
+    {
       question: "Quels sont vos secteurs et communes d'intervention autour de Bordeaux et en Gironde ?",
-      answer: "Damien Pommier intervient rapidement (sous 24h à 48h) dans toutes les villes dans un rayon de 50km autour de Bordeaux et plus généralement dans l'ensemble du département de la Gironde (33). Les principales communes desservies comprennent : Bordeaux, Mérignac, Pessac, Talence, Villenave-d'Ornon, Saint-Médard-en-Jalles, Bègles, Cenon, Gradignan, Lormont, Eysines, Cestas, Floirac, Blanquefort, Bruges, Ambarès-et-Lagrave, Le Bouscat, Léognan, Saint-André-de-Cubzac, Libourne, Gujan-Mestras, Castelnau-de-Médoc, Créon, Saint-Jean-d'Illac, Martignas-sur-Jalle, Canéjan, Carbon-Blanc, Bassens, Saint-Loubès, Artigues-près-Bordeaux, Parempuyre, Le Taillan-Médoc, Saint-Aubin-de-Médoc, Ludon-Médoc, Macau, Langon, Cadillac, Podensac, Portets, Saint-Sulpice-et-Cameyrac, Bouliac, Latresne, Fargues-Saint-Hilaire, Sadirac, Carignan-de-Bordeaux, Blaye, Saint-Émilion, Izon, Saint-Denis-de-Pile, Coutras, Biganos, Audenge, Lanton, Andernos-les-Bains, Marcheprime, Salles, Belin-Béliet, Saint-Selve, La Brède, Martillac, Beautiran, Castres-Gironde, Arsac, Pian-Médoc, Saucats, Le Barp, Tresses, Yvrac, Cénac, Camblanes-et-Meynac, Quinsac, Saint-Caprais-de-Bordeaux, Lignan-de-Bordeaux, Sainte-Eulalie, Montussan, Beychac-et-Caillau, Vayres, Arveyres, Fronsac, Saint-Germain-du-Puch, Baron, Nérigean... Nous nous déplaçons gratuitement pour évaluer le volume à vider et vous proposer un devis personnalisé."
+      answer: "Nous intervenons rapidement (sous 24h à 48h) dans toutes les villes dans un rayon de 50km autour de Bordeaux et plus généralement dans l'ensemble du département de la Gironde (33). Les principales communes desservies comprennent : Bordeaux, Mérignac, Pessac, Talence, Villenave-d'Ornon, Saint-Médard-en-Jalles, Bègles, Cenon, Gradignan, Lormont, Eysines, Cestas, Floirac, Blanquefort, Bruges... Nous nous déplaçons gratuitement pour évaluer le volume à vider.",
+      category: "🗺️ Zone d'intervention"
     },
     {
       question: "Quels sont vos tarifs pour un débarras en Gironde ?",
-      answer: "Nos tarifs sont calculés de manière transparente et sur-mesure. Ils dépendent de trois facteurs clés : le volume total à évacuer (en m³), l'accessibilité des locaux (étages, ascenseur, distance de portage jusqu'au camion) et l'éventuelle valeur des objets récupérables (qui vient en déduction du coût de l'intervention)."
+      answer: "Nos tarifs sont calculés de manière transparente et sur-mesure. Ils dépendent de trois facteurs clés : le volume total à évacuer (en m³), l'accessibilité des locaux (étages, ascenseur, distance de portage jusqu'au camion) et l'éventuelle valeur des objets récupérables (qui vient en déduction du coût de l'intervention).",
+      category: "💰 Tarification"
     },
     {
       question: "Combien de temps dure une intervention classique ?",
-      answer: "La plupart de nos débarras de caves, garages ou appartements se font en une seule journée. Pour des maisons entières ou des chantiers Diogène très encombrés, l'intervention peut s'étendre sur 2 à 3 jours. Nous nous engageons à respecter scrupuleusement les délais convenus."
-    },
-    {
-      question: "Que faites-vous des affaires personnelles et documents importants ?",
-      answer: "La discrétion et le respect de votre vie privée sont nos priorités. Lors du débarras, si nous découvrons des photos de famille, des testaments, des actes notariés, des bijoux ou de l'argent liquide, nous les mettons immédiatement de côté dans un carton sécurisé que nous vous remettons en main propre à la fin du chantier."
-    },
-    {
-      question: "Intervenez-vous pour des cas de syndrome de Diogène ou de logements insalubres ?",
-      answer: "Oui, nous sommes équipés et formés pour intervenir dans les situations d'insalubrité extrême, de logement de personnes atteintes du syndrome de Diogène ou après des sinistres. Nous réalisons le tri, l'évacuation complète des déchets, le nettoyage minutieux et la désinfection totale des pièces."
+      answer: "La plupart de nos débarras de caves, garages ou appartements se font en une seule journée. Pour des maisons entières ou des chantiers Diogène très encombrés, l'intervention peut s'étendre sur 2 à 3 jours. Nous nous engageons à respecter scrupuleusement les délais convenus.",
+      category: "🛠️ Logistique & Outils"
     },
     {
       question: "Comment puis-je obtenir un devis ou une estimation précise ?",
-      answer: "C'est très simple et gratuit ! Vous pouvez utiliser notre simulateur de m³ en ligne ci-dessus, nous appeler directement au 06 61 29 20 59, ou nous envoyer des photos du chantier par SMS ou par email. Si nécessaire, nous nous déplaçons gratuitement chez vous pour évaluer le travail et vous proposer un devis ferme sous 24h."
+      answer: "C'est très simple et gratuit ! Vous pouvez utiliser notre simulateur de m³ en ligne ci-dessus, nous appeler directement ou nous envoyer des photos du chantier par SMS ou par email. Si nécessaire, nous nous déplaçons gratuitement chez vous pour évaluer le travail et vous proposer un devis ferme sous 24h.",
+      category: "💰 Tarification"
     }
   ];
 
@@ -208,9 +245,16 @@ export default function ConseilsAndFAQ() {
                     }}
                     className="w-full text-left p-5 flex items-center justify-between gap-4 font-sans font-bold text-slate-900 text-sm md:text-base hover:bg-slate-50/50 transition cursor-pointer"
                   >
-                    <span className="flex items-center gap-3">
-                      <HelpCircle className="w-5 h-5 text-emerald-600 shrink-0" />
-                      <span>{item.question}</span>
+                    <span className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 w-full pr-1">
+                      <span className="flex items-center gap-3">
+                        <HelpCircle className="w-5 h-5 text-emerald-600 shrink-0" />
+                        <span>{item.question}</span>
+                      </span>
+                      {item.category && (
+                        <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest bg-slate-50 text-emerald-800 border border-emerald-100/60 px-2.5 py-0.5 rounded-md shrink-0 w-fit font-sans">
+                          {item.category}
+                        </span>
+                      )}
                     </span>
                     <ChevronDown className={`w-5 h-5 text-slate-400 shrink-0 transition-transform duration-350 ${isOpen ? 'rotate-180 text-emerald-600' : ''}`} />
                   </button>
