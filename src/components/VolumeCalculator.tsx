@@ -1079,9 +1079,18 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
                       required
                       value={zipCode}
                       onChange={(e) => setZipCode(e.target.value)}
-                      placeholder="ex: 75015"
-                      className="w-full bg-white/60 border border-slate-200/50 rounded-xl p-2.5 text-xs font-semibold focus:bg-white/95 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:outline-none transition"
+                      placeholder="ex: 33000"
+                      className={`w-full bg-white/60 border rounded-xl p-2.5 text-xs font-semibold focus:bg-white/95 focus:ring-2 focus:outline-none transition ${
+                        zipCode && !/^\d{5}$/.test(zipCode.trim())
+                          ? 'border-red-500 bg-red-50/10 text-red-900 focus:ring-red-500/20 focus:border-red-500'
+                          : 'border-slate-200/50 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500'
+                      }`}
                     />
+                    {zipCode && !/^\d{5}$/.test(zipCode.trim()) && (
+                      <p className="text-[10px] text-red-500 font-bold mt-1 font-sans">
+                        Code postal invalide (5 chiffres requis)
+                      </p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-xs font-bold text-slate-600 mb-1">Ville *</label>
@@ -1090,7 +1099,7 @@ export default function VolumeCalculator({ onQuoteSubmitted }: VolumeCalculatorP
                       required
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      placeholder="ex: Paris"
+                      placeholder="ex: Bordeaux"
                       className="w-full bg-white/60 border border-slate-200/50 rounded-xl p-2.5 text-xs font-semibold focus:bg-white/95 focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 focus:outline-none transition"
                     />
                   </div>

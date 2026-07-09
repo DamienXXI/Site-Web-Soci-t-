@@ -19,7 +19,8 @@ import {
   Shield,
   Check,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Printer
 } from 'lucide-react';
 
 interface MyRequestsDrawerProps {
@@ -50,6 +51,14 @@ export default function MyRequestsDrawer({
   onFormspreeEndpointChange
 }: MyRequestsDrawerProps) {
   const [isAdminExpanded, setIsAdminExpanded] = React.useState(false);
+  const [printQuote, setPrintQuote] = React.useState<QuoteRequest | null>(null);
+
+  const handlePrint = (quote: QuoteRequest) => {
+    setPrintQuote(quote);
+    setTimeout(() => {
+      window.print();
+    }, 150);
+  };
   
   if (!isOpen) return null;
 
@@ -281,6 +290,19 @@ export default function MyRequestsDrawer({
                           </div>
                         )}
 
+                        {/* Exporter en PDF */}
+                        <div className="pt-2.5 border-t border-slate-200/50 flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => handlePrint(quote)}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-850 text-[10px] font-black rounded-xl border border-emerald-200/40 transition duration-150 cursor-pointer shadow-sm"
+                            title="Imprimer ou exporter ce devis en PDF"
+                          >
+                            <Printer className="w-3.5 h-3.5 text-emerald-700" />
+                            <span>Exporter en PDF</span>
+                          </button>
+                        </div>
+
                       </div>
                     );
                   })}
@@ -305,6 +327,107 @@ export default function MyRequestsDrawer({
 
         </div>
       </div>
+
+      {/* Hidden high-fidelity document specifically designed for clean print/PDF export */}
+      {printQuote && (
+        <div className="hidden print:block fixed inset-0 bg-white text-slate-900 p-10 z-[99999] font-sans">
+          <style dangerouslySetInnerHTML={{__html: `
+            @media print {
+              body {
+                background: white !important;
+                color: black !important;
+              }
+              #root > *:not(.print-container-wrapper), .fixed, .absolute, .drawer-backdrop {
+                display: none !important;
+              }
+              .print-container-wrapper {
+                display: block !important;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                height: auto !important;
+                z-index: 9999999 !important;
+                background: white !important;
+              }
+            }
+          `}} />
+          <div className="print-container-wrapper space-y-6 bg-white p-6">
+            {/* Header */}
+            <div className="flex justify-between items-start border-b-2 border-emerald-600 pb-4">
+              <div>
+                <h1 className="text-2xl font-black text-emerald-800 tracking-tight">ALLOSERVICES33</h1>
+                <p className="text-xs text-slate-600 font-bold">Débarras, Déménagement & Tri Éco-Responsable</p>
+                <p className="text-xs text-slate-500">Gironde (33) — Contact : Damien Pommier</p>
+                <p className="text-xs text-slate-500">Téléphone : 06 61 29 20 59</p>
+              </div>
+              <div className="text-right">
+                <h2 className="text-lg font-extrabold text-slate-900 uppercase">Devis Estimatif</h2>
+                <p className="text-xs font-bold text-slate-500">Référence : {printQuote.id}</p>
+                <p className="text-xs text-slate-500">Date : {new Date(printQuote.createdAt).toLocaleDateString('fr-FR')}</p>
+                <p className="text-xs text-slate-500">Cadre : <span className="font-bold uppercase">{printQuote.serviceType}</span></p>
+              </div>
+            </div>
+
+            {/* Main Details */}
+            <div className="grid grid-cols-2 gap-4 border border-slate-200 rounded-xl p-4 bg-slate-50/50">
+              <div>
+                <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-1">Destinataire / Lieu</h3>
+                <p className="text-sm font-bold text-slate-800">{printQuote.city} ({printQuote.zipCode})</p>
+                <p className="text-xs text-slate-500">Département de la Gironde (33)</p>
+              </div>
+              <div className="text-right">
+                <h3 className="text-xs font-black text-slate-400 uppercase tracking-wider mb-1">Volume Estimé</h3>
+                <p className="text-xl font-black text-emerald-600">{printQuote.estimatedVolumeM3} m³</p>
+                <p className="text-xs text-slate-500">Estimation basée sur l'inventaire fourni</p>
+              </div>
+            </div>
+
+            {/* Inventory */}
+            <div className="space-y-2">
+              <h3 className="text-xs font-black text-slate-500 uppercase tracking-wider border-b border-slate-200 pb-1">Inventaire détaillé des encombrants</h3>
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-200 text-xs text-slate-400 font-bold">
+                    <th className="py-2">Article</th>
+                    <th className="py-2 text-center">Quantité</th>
+                    <th className="py-2 text-right">Volume unitaire</th>
+                    <th className="py-2 text-right">Volume total</th>
+                  </tr>
+                </thead>
+                <tbody className="text-xs text-slate-700 font-medium">
+                  {(Object.entries(printQuote.selectedItems) as [string, number][]).filter(([_, qty]) => qty > 0).map(([itemId, qty]) => {
+                    const item = WASTE_ITEMS.find(i => i.id === itemId);
+                    if (!item) return null;
+                    const volTotal = (Number(item.volumeM3) * Number(qty)).toFixed(2);
+                    return (
+                      <tr key={itemId} className="border-b border-slate-100">
+                        <td className="py-2 font-bold text-slate-800">{item.name}</td>
+                        <td className="py-2 text-center">{qty}</td>
+                        <td className="py-2 text-right text-slate-500">{item.volumeM3} m³</td>
+                        <td className="py-2 text-right font-bold text-emerald-700">{volTotal} m³</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Footer / Notes */}
+            <div className="border-t border-slate-200 pt-4 space-y-2 text-[10px] text-slate-500 leading-relaxed">
+              <p className="font-bold text-slate-600">Informations complémentaires :</p>
+              <p>• Ce document est une estimation automatique indicative de la volumétrie. Il ne constitue pas un devis définitif ferme.</p>
+              <p>• Une visite technique gratuite ou l'envoi de photos complémentaires pourra être requis par Damien Pommier pour valider définitivement les tarifs de manutention et de mise en décharge éco-responsable.</p>
+              <p>• Les frais réels dépendent également des contraintes d'accès (étages, ascenseur, distance de portage) et de la nature des déchets.</p>
+            </div>
+
+            <div className="pt-8 text-center text-[9px] text-slate-400 border-t border-dashed border-slate-200 font-semibold uppercase tracking-wider">
+              AlloServices33 — Rigueur, Respect, Propreté et Recyclage Éco-Responsable en Gironde
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

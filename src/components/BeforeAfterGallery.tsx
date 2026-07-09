@@ -170,7 +170,7 @@ export default function BeforeAfterGallery() {
             Preuves d'Excellence
           </span>
           <h2 className="text-3xl md:text-5xl font-black font-display text-slate-900 tracking-tight leading-tight">
-            Interventions Avant / Après
+            Réalisations Avant / Après
           </h2>
           <p className="text-slate-500 text-xs sm:text-sm max-w-xl mx-auto mt-2 font-semibold font-sans">
             Faites glisser la poignée centrale pour révéler en temps réel l'impact du travail soigné de Damien.

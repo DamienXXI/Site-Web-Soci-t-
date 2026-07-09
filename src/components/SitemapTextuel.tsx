@@ -31,7 +31,7 @@ export default function SitemapTextuel({ setCurrentPage, setActiveModal }: Sitem
         { label: "Accueil / Présentation", action: () => handleAnchorClick('accueil') },
         { label: "Enlèvement d'Encombrants & Débarras", action: () => handleAnchorClick('enlevements') },
         { label: "Service de Déménagement & Transport", action: () => handleAnchorClick('demenagement') },
-        { label: "Interventions Avant / Après (Galerie)", action: () => handleAnchorClick('galerie'), disabled: true },
+        { label: "Réalisations Avant / Après (Galerie)", action: () => handleAnchorClick('galerie'), disabled: true },
         { label: "Calculateur de Volume m³", action: () => handleAnchorClick('accueil', 'calculateur-volume') },
         { label: "Foire Aux Questions (FAQ)", action: () => handleAnchorClick('accueil', 'faq') },
         { label: "Conseils de Débarras & Tri", action: () => handleAnchorClick('accueil', 'conseils-debarras') },

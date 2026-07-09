@@ -7,6 +7,8 @@ import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence, useInView } from 'motion/react';
 import {
   Phone,
+  Sun,
+  Moon,
   Calendar,
   Award,
   Star,
@@ -39,7 +41,9 @@ import {
   RotateCcw,
   Check,
   Trash2,
-  ArrowUp
+  ArrowUp,
+  Linkedin,
+  Mail
 } from 'lucide-react';
 // @ts-ignore
 import humanPhoto from './assets/images/human_loading_van_1782143690142.jpg';
@@ -145,8 +149,15 @@ export default function App() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [quotes, setQuotes] = useState<QuoteRequest[]>([]);
 
+  // Force light mode
+  useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    localStorage.setItem('theme', 'light');
+  }, []);
+
   // Collapsible zones d'intervention
   const [isZonesExpanded, setIsZonesExpanded] = useState(false);
+  const [selectedZone, setSelectedZone] = useState<string | null>(null);
 
   // Lead receiving configurations (Options 1, 2)
   const [leadDestination, setLeadDestination] = useState<'local' | 'email'>(() => {
@@ -331,9 +342,9 @@ export default function App() {
         keywords: "terrassement jardin bordeaux, nettoyage terrasse gironde, nivellement terrain bordeaux, dessouchage gironde, travaux exterieurs gironde"
       },
       galerie: {
-        title: "Interventions Avant / Après | AlloServices33",
-        description: "Découvrez notre sélection interactive de photos Avant / Après illustrant nos interventions de débarras de maisons, caves, greniers et déménagements en Gironde.",
-        keywords: "debarras avant apres, interventions photos debarras bordeaux, nettoyage diogene photos, photos debarras gironde, tri debarras"
+        title: "Réalisations Avant / Après | AlloServices33",
+        description: "Découvrez notre sélection interactive de photos Avant / Après illustrant nos réalisations de débarras de maisons, caves, greniers et déménagements en Gironde.",
+        keywords: "debarras avant apres, realisations photos debarras bordeaux, nettoyage diogene photos, photos debarras gironde, tri debarras"
       }
     };
 
@@ -580,14 +591,14 @@ Référence de suivi : ${newQuote.id}
   };
 
   return (
-    <div id="main-app-container" className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 font-sans text-slate-800 antialiased relative">
+    <div id="main-app-container" className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 dark:from-slate-900 dark:via-slate-950 dark:to-slate-900 dark:text-slate-100 font-sans text-slate-800 antialiased relative transition-colors duration-200">
       {/* Background Decor Blurred Circles */}
-      <div className="absolute top-[-5%] right-[-10%] w-[500px] h-[500px] bg-emerald-200/40 rounded-full blur-[120px] -z-10 pointer-events-none"></div>
-      <div className="absolute top-[35%] left-[-10%] w-[600px] h-[600px] bg-teal-200/40 rounded-full blur-[130px] -z-10 pointer-events-none"></div>
-      <div className="absolute bottom-[20%] right-[-5%] w-[550px] h-[550px] bg-emerald-100/40 rounded-full blur-[110px] -z-10 pointer-events-none"></div>
-      <div className="absolute bottom-[-5%] left-[5%] w-[500px] h-[500px] bg-teal-100/40 rounded-full blur-[100px] -z-10 pointer-events-none"></div>
+      <div className="absolute top-[-5%] right-[-10%] w-[500px] h-[500px] bg-emerald-200/40 rounded-full blur-[120px] -z-10 pointer-events-none dark:opacity-20"></div>
+      <div className="absolute top-[35%] left-[-10%] w-[600px] h-[600px] bg-teal-200/40 rounded-full blur-[130px] -z-10 pointer-events-none dark:opacity-20"></div>
+      <div className="absolute bottom-[20%] right-[-5%] w-[550px] h-[550px] bg-emerald-100/40 rounded-full blur-[110px] -z-10 pointer-events-none dark:opacity-20"></div>
+      <div className="absolute bottom-[-5%] left-[5%] w-[500px] h-[500px] bg-teal-100/40 rounded-full blur-[100px] -z-10 pointer-events-none dark:opacity-20"></div>
 
-      <nav className="sticky top-0 bg-white/80 backdrop-blur-xl z-40 border-b border-slate-100/80 shadow-sm transition-all duration-200">
+      <nav className="sticky top-0 bg-white/85 dark:bg-slate-900/85 backdrop-blur-xl z-40 border-b border-slate-100/80 dark:border-slate-800 shadow-sm transition-all duration-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             
@@ -619,11 +630,11 @@ Référence de suivi : ${newQuote.id}
                 }}
                 className="text-left focus:outline-none hover:opacity-85 transition group cursor-pointer"
               >
-                <span className="font-display font-black text-xl text-slate-900 tracking-tight block leading-tight group-hover:text-emerald-700 transition-colors">
-                  Damien Pommier
+                <span className="text-[10px] sm:text-[11px] font-extrabold uppercase tracking-widest block leading-none text-[#800020] dark:text-emerald-400 transition-colors">
+                  Mes Services
                 </span>
-                <span className="text-[10px] text-slate-500 font-extrabold uppercase tracking-widest block -mt-0.5">
-                  Mes services à votre service
+                <span className="text-[10px] text-[#800020]/90 dark:text-emerald-400/90 font-extrabold uppercase tracking-widest block mt-0.5">
+                  À votre service
                 </span>
               </button>
             </div>
@@ -728,7 +739,7 @@ Référence de suivi : ${newQuote.id}
                 className="text-xs px-4.5 py-2.5 rounded-full font-black uppercase tracking-wide flex items-center gap-1.5 border-2 border-slate-200 bg-slate-100 text-slate-400 opacity-60 cursor-not-allowed select-none shadow-sm"
                 title="Service temporairement indisponible"
               >
-                📸 Interventions <span className="text-[9px] px-1.5 py-0.5 bg-slate-200 text-slate-500 rounded font-bold uppercase tracking-wider">indisponible</span>
+                📸 Réalisations <span className="text-[9px] px-1.5 py-0.5 bg-slate-200 text-slate-500 rounded font-bold uppercase tracking-wider">indisponible</span>
               </button>
                
               <button 
@@ -832,7 +843,7 @@ Référence de suivi : ${newQuote.id}
                   disabled
                   className="w-full text-left block p-3 text-sm font-black rounded-xl bg-slate-50 text-slate-400 opacity-60 cursor-not-allowed select-none border border-slate-200/40"
                 >
-                  📸 Interventions <span className="ml-1 text-[9px] px-1.5 py-0.5 bg-slate-200 text-slate-500 rounded font-bold uppercase tracking-wider">indisponible</span>
+                  📸 Réalisations <span className="ml-1 text-[9px] px-1.5 py-0.5 bg-slate-200 text-slate-500 rounded font-bold uppercase tracking-wider">indisponible</span>
                 </button>
               </div>
 
@@ -881,7 +892,15 @@ Référence de suivi : ${newQuote.id}
                 
                 {/* Card 1: Encombrants */}
                 <ScrollReveal delay={0.1}>
-                  <div className="bg-white rounded-3xl p-6 border border-slate-150 shadow-xs hover:shadow-lg hover:border-emerald-300/40 transition-all duration-300 flex flex-col justify-between h-[340px] group">
+                  <motion.div
+                    whileHover={{ y: -8, scale: 1.03, boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)" }}
+                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                    onClick={() => {
+                      setCurrentPage('enlevements');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="bg-white rounded-3xl p-6 border border-slate-150 shadow-xs hover:border-emerald-300/40 transition-all duration-300 flex flex-col justify-between h-[340px] group cursor-pointer"
+                  >
                     <div className="space-y-3">
                       <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform duration-200">
                         📦
@@ -893,30 +912,30 @@ Référence de suivi : ${newQuote.id}
                         Débarras d'appartements, maisons, bureaux commerciaux et caves. Intervention sous 24h/48h avec balayage et tri éco-responsable.
                       </p>
                     </div>
-                    <button
-                      onClick={() => {
-                        setCurrentPage('enlevements');
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      className="mt-6 pt-4 border-t border-slate-100 font-extrabold text-xs uppercase tracking-wider text-emerald-600 hover:text-emerald-700 flex items-center justify-between cursor-pointer w-full text-left"
+                    <div
+                      className="mt-6 pt-4 border-t border-slate-100 font-extrabold text-xs uppercase tracking-wider text-emerald-600 hover:text-emerald-700 flex items-center justify-between w-full text-left"
                     >
                       <span>Voir ce service</span> <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
+                    </div>
+                  </motion.div>
                 </ScrollReveal>
 
                 {/* Card 2: Nettoyage Logement */}
                 <ScrollReveal delay={0.2}>
-                  <div className="bg-slate-50/50 rounded-3xl p-6 border border-slate-200/60 flex flex-col justify-between h-[340px] opacity-60 select-none">
+                  <motion.div
+                    whileHover={{ y: -4, scale: 1.015, boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05)" }}
+                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                    className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border border-slate-200/65 shadow-xs flex flex-col justify-between h-[340px] opacity-80 select-none group"
+                  >
                     <div className="space-y-3">
-                      <div className="w-12 h-12 rounded-xl bg-slate-200/50 border border-slate-300/40 flex items-center justify-center text-2xl grayscale">
+                      <div className="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-2xl grayscale group-hover:scale-105 transition-transform duration-200">
                         🧼
                       </div>
-                      <h3 className="font-display font-extrabold text-slate-500 text-lg flex items-center gap-1.5 flex-wrap">
+                      <h3 className="font-display font-extrabold text-slate-700 text-lg flex items-center gap-1.5 flex-wrap">
                         <span>Nettoyage Logements</span>
                         <span className="px-1.5 py-0.5 text-[8px] bg-slate-200 text-slate-600 rounded font-bold uppercase tracking-wider">prochainement</span>
                       </h3>
-                      <p className="text-slate-450 text-xs sm:text-sm leading-relaxed font-sans font-medium">
+                      <p className="text-slate-500 text-xs sm:text-sm leading-relaxed font-sans font-medium">
                         Ménage minutieux de fin de bail, de chantier ou traitement de salubrité diogène de vos appartements ou maisons.
                       </p>
                     </div>
@@ -925,21 +944,25 @@ Référence de suivi : ${newQuote.id}
                     >
                       <span>Bientôt disponible</span>
                     </div>
-                  </div>
+                  </motion.div>
                 </ScrollReveal>
 
                 {/* Card 3: Entretien Parties Communes */}
                 <ScrollReveal delay={0.3}>
-                  <div className="bg-slate-50/50 rounded-3xl p-6 border border-slate-200/60 flex flex-col justify-between h-[340px] opacity-60 select-none">
+                  <motion.div
+                    whileHover={{ y: -4, scale: 1.015, boxShadow: "0 10px 15px -3px rgb(0 0 0 / 0.05), 0 4px 6px -4px rgb(0 0 0 / 0.05)" }}
+                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                    className="bg-white/60 backdrop-blur-sm rounded-3xl p-6 border border-slate-200/65 shadow-xs flex flex-col justify-between h-[340px] opacity-80 select-none group"
+                  >
                     <div className="space-y-3">
-                      <div className="w-12 h-12 rounded-xl bg-slate-200/50 border border-slate-300/40 flex items-center justify-center text-2xl grayscale">
+                      <div className="w-12 h-12 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-2xl grayscale group-hover:scale-105 transition-transform duration-200">
                         🧹
                       </div>
-                      <h3 className="font-display font-extrabold text-slate-500 text-lg flex items-center gap-1.5 flex-wrap">
+                      <h3 className="font-display font-extrabold text-slate-700 text-lg flex items-center gap-1.5 flex-wrap">
                         <span>Parties Communes</span>
                         <span className="px-1.5 py-0.5 text-[8px] bg-slate-200 text-slate-600 rounded font-bold uppercase tracking-wider">prochainement</span>
                       </h3>
-                      <p className="text-slate-450 text-xs sm:text-sm leading-relaxed font-sans font-medium">
+                      <p className="text-slate-500 text-xs sm:text-sm leading-relaxed font-sans font-medium">
                         Contrat d'entretien pour immeubles de copropriété. Balayage hebdomadaire, lavage des halls et gestion des bacs poubelles.
                       </p>
                     </div>
@@ -948,12 +971,20 @@ Référence de suivi : ${newQuote.id}
                     >
                       <span>Bientôt disponible</span>
                     </div>
-                  </div>
+                  </motion.div>
                 </ScrollReveal>
 
                 {/* Card 4: Déménagement */}
                 <ScrollReveal delay={0.4}>
-                  <div className="bg-white rounded-3xl p-6 border border-slate-150 shadow-xs hover:shadow-lg hover:border-emerald-300/40 transition-all duration-300 flex flex-col justify-between h-[340px] group">
+                  <motion.div
+                    whileHover={{ y: -8, scale: 1.03, boxShadow: "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)" }}
+                    transition={{ type: "spring", stiffness: 400, damping: 15 }}
+                    onClick={() => {
+                      setCurrentPage('demenagement');
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    }}
+                    className="bg-white rounded-3xl p-6 border border-slate-150 shadow-xs hover:border-emerald-300/40 transition-all duration-300 flex flex-col justify-between h-[340px] group cursor-pointer"
+                  >
                     <div className="space-y-3">
                       <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-2xl group-hover:scale-105 transition-transform duration-200">
                         🚚
@@ -965,16 +996,12 @@ Référence de suivi : ${newQuote.id}
                         Transport de mobilier, transfert de charges volumineuses ou aide logistique avec calculateur de volume précis et devis immédiat.
                       </p>
                     </div>
-                    <button
-                      onClick={() => {
-                        setCurrentPage('demenagement');
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
-                      }}
-                      className="mt-6 pt-4 border-t border-slate-100 font-extrabold text-xs uppercase tracking-wider text-emerald-600 hover:text-emerald-700 flex items-center justify-between cursor-pointer w-full text-left"
+                    <div
+                      className="mt-6 pt-4 border-t border-slate-100 font-extrabold text-xs uppercase tracking-wider text-emerald-600 hover:text-emerald-700 flex items-center justify-between w-full text-left"
                     >
                       <span>Voir ce service</span> <ArrowRight className="w-4 h-4" />
-                    </button>
-                  </div>
+                    </div>
+                  </motion.div>
                 </ScrollReveal>
               </div>
             </div>
@@ -1318,58 +1345,62 @@ Référence de suivi : ${newQuote.id}
           <div className="space-y-10">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Service Card 1: Particuliers */}
-              <div id="particuliers-section" className="bg-white/50 backdrop-blur-md rounded-3xl p-8 border border-white/60 shadow-sm hover:bg-white/70 hover:shadow-xl hover:border-emerald-300/50 transition-all duration-300 flex flex-col justify-between">
-                <div className="space-y-4">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100/50 flex items-center justify-center text-3xl">
-                    🏠
+              <ScrollReveal delay={0.1}>
+                <div id="particuliers-section" className="bg-white/50 backdrop-blur-md rounded-3xl p-8 border border-white/60 shadow-sm hover:bg-white/70 hover:shadow-xl hover:border-emerald-300/50 transition-all duration-300 flex flex-col justify-between h-full">
+                  <div className="space-y-4">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100/50 flex items-center justify-center text-3xl">
+                      🏠
+                    </div>
+                    <h3 className="font-display font-bold text-slate-900 text-xl">Pour les Particuliers</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      Appartements, maisons pavillonnaires ou résidences secondaires. Idéal suite à une succession notariale, un déménagement d'immeuble sans ascenseur ou l'évacuation d'encombrants accumulés.
+                    </p>
+                    <ul className="text-xs text-slate-500 space-y-2 pt-3">
+                      <li className="flex items-center gap-1.5 font-bold text-slate-600 font-sans">✨ Nettoyage & Balayage en fin de journée</li>
+                      <li className="flex items-center gap-1.5 font-bold text-slate-600 font-sans">📦 Tri sélectif des souvenirs précieux</li>
+                      <li className="flex items-center gap-1.5 font-bold text-slate-600 font-sans">📋 Solutions Diogène et réhabilitation</li>
+                    </ul>
                   </div>
-                  <h3 className="font-display font-bold text-slate-900 text-xl">Pour les Particuliers</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">
-                    Appartements, maisons pavillonnaires ou résidences secondaires. Idéal suite à une succession notariale, un déménagement d'immeuble sans ascenseur ou l'évacuation d'encombrants accumulés.
-                  </p>
-                  <ul className="text-xs text-slate-500 space-y-2 pt-3">
-                    <li className="flex items-center gap-1.5 font-bold text-slate-600 font-sans">✨ Nettoyage & Balayage en fin de journée</li>
-                    <li className="flex items-center gap-1.5 font-bold text-slate-600 font-sans">📦 Tri sélectif des souvenirs précieux</li>
-                    <li className="flex items-center gap-1.5 font-bold text-slate-600 font-sans">📋 Solutions Diogène et réhabilitation</li>
-                  </ul>
+                  <button
+                    onClick={() => {
+                      const el = document.getElementById('simulateur-enlevement');
+                      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    className="mt-8 pt-4 border-t border-slate-200/60 font-bold text-xs uppercase tracking-wider text-emerald-600 hover:text-emerald-700 hover:underline flex items-center gap-1.5 cursor-pointer text-left w-full"
+                  >
+                    <span>Estimer mon volume</span> <ArrowRight className="w-4 h-4" />
+                  </button>
                 </div>
-                <button
-                  onClick={() => {
-                    const el = document.getElementById('simulateur-enlevement');
-                    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }}
-                  className="mt-8 pt-4 border-t border-slate-200/60 font-bold text-xs uppercase tracking-wider text-emerald-600 hover:text-emerald-700 hover:underline flex items-center gap-1.5 cursor-pointer text-left w-full"
-                >
-                  <span>Estimer mon volume</span> <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
+              </ScrollReveal>
 
               {/* Service Card 2: Professionnels */}
-              <div id="professionnels-section" className="bg-white/50 backdrop-blur-md rounded-3xl p-8 border border-white/60 shadow-sm hover:bg-white/70 hover:shadow-xl hover:border-emerald-300/50 transition-all duration-300 flex flex-col justify-between">
-                <div className="space-y-4">
-                  <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100/50 flex items-center justify-center text-3xl">
-                    🏢
+              <ScrollReveal delay={0.25}>
+                <div id="professionnels-section" className="bg-white/50 backdrop-blur-md rounded-3xl p-8 border border-white/60 shadow-sm hover:bg-white/70 hover:shadow-xl hover:border-emerald-300/50 transition-all duration-300 flex flex-col justify-between h-full">
+                  <div className="space-y-4">
+                    <div className="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100/50 flex items-center justify-center text-3xl">
+                      🏢
+                    </div>
+                    <h3 className="font-display font-bold text-slate-900 text-xl">Pour les Professionnels</h3>
+                    <p className="text-slate-600 text-sm leading-relaxed">
+                      Copropriétés, appartements en location, bureaux, locaux commerciaux. Une offre sur-mesure pour les syndics, agences de location et bailleurs sociaux. Peu importe l'encombrement, je suis professionnel et j'interviens avec rigueur, respect, et réalise un balayage à la fin de chaque chantier.
+                    </p>
+                    <ul className="text-xs text-slate-500 space-y-2 pt-3">
+                      <li className="flex items-center gap-1.5 font-bold text-slate-600 font-sans">🏬 Pour syndics, agences de location & bailleurs sociaux</li>
+                      <li className="flex items-center gap-1.5 font-bold text-slate-600 font-sans">💼 Copropriétés, appartements, bureaux & locaux</li>
+                      <li className="flex items-center gap-1.5 font-bold text-slate-600 font-sans">✨ Intervention rigoureuse, respectueuse & balayage final</li>
+                    </ul>
                   </div>
-                  <h3 className="font-display font-bold text-slate-900 text-xl">Pour les Professionnels</h3>
-                  <p className="text-slate-600 text-sm leading-relaxed">
-                    Copropriétés, appartements en location, bureaux, locaux commerciaux. Une offre sur-mesure pour les syndics, agences de location et bailleurs sociaux. Peu importe l'encombrement, je suis professionnel et j'interviens avec rigueur, respect, et réalise un balayage à la fin de chaque chantier.
-                  </p>
-                  <ul className="text-xs text-slate-500 space-y-2 pt-3">
-                    <li className="flex items-center gap-1.5 font-bold text-slate-600 font-sans">🏬 Pour syndics, agences de location & bailleurs sociaux</li>
-                    <li className="flex items-center gap-1.5 font-bold text-slate-600 font-sans">💼 Copropriétés, appartements, bureaux & locaux</li>
-                    <li className="flex items-center gap-1.5 font-bold text-slate-600 font-sans">✨ Intervention rigoureuse, respectueuse & balayage final</li>
-                  </ul>
+                  <button
+                    onClick={() => {
+                      const el = document.getElementById('simulateur-enlevement');
+                      el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }}
+                    className="mt-8 pt-4 border-t border-slate-200/60 font-bold text-xs uppercase tracking-wider text-emerald-600 hover:text-emerald-700 hover:underline flex items-center gap-1.5 cursor-pointer text-left w-full"
+                  >
+                    <span>Estimer mon volume</span> <ArrowRight className="w-4 h-4" />
+                  </button>
                 </div>
-                <button
-                  onClick={() => {
-                    const el = document.getElementById('simulateur-enlevement');
-                    el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                  }}
-                  className="mt-8 pt-4 border-t border-slate-200/60 font-bold text-xs uppercase tracking-wider text-emerald-600 hover:text-emerald-700 hover:underline flex items-center gap-1.5 cursor-pointer text-left w-full"
-                >
-                  <span>Estimer mon volume</span> <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
+              </ScrollReveal>
             </div>
 
             {/* Dons & Recyclage visual segment integrated directly into encombrants */}
@@ -1710,34 +1741,122 @@ Référence de suivi : ${newQuote.id}
                 transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                 className="overflow-hidden"
               >
-                <div className="pt-4 space-y-3.5">
-                  <p className="text-[10px] text-slate-500 leading-relaxed font-semibold">
-                    AlloServices33 intervient rapidement pour vos débarras, déménagements et nettoyages professionnels dans l'ensemble de la métropole bordelaise et de la Gironde (33). Retrouvez ci-dessous la liste détaillée de nos secteurs d'activité :
-                  </p>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-3 gap-y-2 text-[10px] text-slate-400 font-semibold">
-                    {[
-                      "Bordeaux Centre (33000)", "Mérignac (33700)", "Pessac (33600)", "Talence (33400)", "Villenave-d'Ornon (33140)", 
-                      "Saint-Médard-en-Jalles (33160)", "Bègles (33130)", "Gradignan (33170)", "Cenon (33150)", "Libourne (33500)", 
-                      "Lormont (33310)", "Le Bouscat (33110)", "Eysines (33320)", "Floirac (33270)", "Cestas (33610)", "Blanquefort (33290)", 
-                      "Bruges (33520)", "Ambarès-et-Lagrave (33440)", "La Teste-de-Buch (33260)", "Gujan-Mestras (33470)", 
-                      "Arcachon (33120)", "Andernos-les-Bains (33510)", "Le Haillan (33185)", "Parempuyre (33290)", 
-                      "Martignas-sur-Jalle (33127)", "Taillan-Médoc (33320)", "Saint-Loubès (33450)", "Artigues-près-Bordeaux (33370)", 
-                      "Carbon-Blanc (33560)", "Sainte-Eulalie (33560)", "Saint-Jean-d'Illac (33127)", "Le Pian-Médoc (33290)"
-                    ].map((city) => (
-                      <a
-                        key={city}
-                        href="/"
-                        onClick={(e) => {
-                          e.preventDefault();
-                          setCurrentPage('accueil');
-                          window.scrollTo({ top: 0, behavior: 'smooth' });
-                        }}
-                        className="hover:text-emerald-400 hover:underline transition-all block py-0.5 truncate"
-                        title={`Service de débarras et déménagement à ${city}`}
-                      >
-                        Débarras {city}
-                      </a>
-                    ))}
+                <div className="pt-4 space-y-4">
+                  {/* Explanatory helper text */}
+                  <div className="text-[10px] text-slate-500 font-bold flex items-center gap-1.5 bg-slate-950/20 px-3 py-2 rounded-xl border border-slate-800/40 w-fit">
+                    <span>💡</span> 
+                    <span>Astuce : Cliquez sur une zone de la cartographie ci-dessous pour filtrer instantanément les communes correspondantes.</span>
+                  </div>
+
+                  <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+                    {/* Left Column: Visual Map Box */}
+                    <div className="lg:col-span-4">
+                      <div className="bg-slate-950 border border-slate-800 rounded-2xl p-4 space-y-3 shadow-inner">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-black text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                            📍 Cartographie Gironde
+                          </span>
+                          {selectedZone ? (
+                            <button 
+                              onClick={() => setSelectedZone(null)}
+                              className="text-[9px] text-emerald-400 hover:text-white underline font-extrabold cursor-pointer"
+                            >
+                              Tout voir
+                            </button>
+                          ) : (
+                            <span className="text-[10px] text-slate-500 font-extrabold uppercase tracking-widest">Zone 33</span>
+                          )}
+                        </div>
+                        
+                        <div className="grid grid-cols-4 gap-1.5 text-[10px] font-mono text-center font-bold">
+                          {["Médoc", "Bdx Ctr", "Rive Dr.", "Bassin", "Libourne", "Graves", "Entre-2", "Sud-Gir."].map((zone) => {
+                            const isSelected = selectedZone === zone;
+                            return (
+                              <button
+                                key={zone}
+                                onClick={() => setSelectedZone(selectedZone === zone ? null : zone)}
+                                className={`p-2 rounded text-[9px] font-bold tracking-wide transition-all duration-200 cursor-pointer border ${
+                                  isSelected
+                                    ? 'bg-[#800020] text-white border-[#9c0c32] shadow-md scale-[1.04]'
+                                    : 'bg-emerald-950/30 border-emerald-900/40 text-emerald-400 hover:bg-emerald-900/45 hover:text-emerald-300'
+                                }`}
+                                title={`Filtrer par zone : ${zone}`}
+                              >
+                                {zone}
+                              </button>
+                            );
+                          })}
+                        </div>
+                        
+                        <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
+                          Intervention ultra-rapide sous 24h à 48h dans Bordeaux Métropole, le Libournais, le bassin d'Arcachon, et l'ensemble de la Gironde. Déplacements & devis personnalisés gratuits.
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {/* Right Column: List of Cities */}
+                    <div className="lg:col-span-8 space-y-3.5">
+                      <div className="flex items-center justify-between">
+                        <p className="text-[10px] text-slate-500 leading-relaxed font-semibold">
+                          AlloServices33 intervient rapidement pour vos débarras, déménagements et nettoyages professionnels dans l'ensemble de la métropole bordelaise et de la Gironde (33). Secteurs d'activité :
+                        </p>
+                        {selectedZone && (
+                          <span className="shrink-0 text-[9px] font-extrabold uppercase tracking-wider bg-slate-950 text-emerald-450 border border-slate-800 px-2 py-1 rounded-lg flex items-center gap-1.5">
+                            Filtre : {selectedZone}
+                            <button 
+                              onClick={() => setSelectedZone(null)} 
+                              className="text-red-400 hover:text-red-350 font-black cursor-pointer ml-1 text-xs"
+                              title="Annuler le filtre"
+                            >
+                              ×
+                            </button>
+                          </span>
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-x-3 gap-y-2 text-[10px] text-slate-400 font-semibold transition-all duration-300">
+                        {(() => {
+                          const zoneCities: Record<string, string[]> = {
+                            "Médoc": ["Le Pian-Médoc (33290)", "Taillan-Médoc (33320)", "Parempuyre (33290)", "Blanquefort (33290)"],
+                            "Bdx Ctr": ["Bordeaux Centre (33000)", "Le Bouscat (33110)", "Bruges (33520)", "Talence (33400)"],
+                            "Rive Dr.": ["Cenon (33150)", "Lormont (33310)", "Floirac (33270)", "Carbon-Blanc (33560)"],
+                            "Bassin": ["La Teste-de-Buch (33260)", "Gujan-Mestras (33470)", "Arcachon (33120)", "Andernos-les-Bains (33510)"],
+                            "Libourne": ["Libourne (33500)", "Saint-Loubès (33450)", "Sainte-Eulalie (33560)"],
+                            "Graves": ["Pessac (33600)", "Mérignac (33700)", "Saint-Médard-en-Jalles (33160)", "Le Haillan (33185)", "Martignas-sur-Jalle (33127)", "Saint-Jean-d'Illac (33127)", "Eysines (33320)"],
+                            "Entre-2": ["Artigues-près-Bordeaux (33370)", "Ambarès-et-Lagrave (33440)"],
+                            "Sud-Gir.": ["Gradignan (33170)", "Villenave-d'Ornon (33140)", "Bègles (33130)", "Cestas (33610)"]
+                          };
+
+                          const allCities = [
+                            "Bordeaux Centre (33000)", "Mérignac (33700)", "Pessac (33600)", "Talence (33400)", "Villenave-d'Ornon (33140)", 
+                            "Saint-Médard-en-Jalles (33160)", "Bègles (33130)", "Gradignan (33170)", "Cenon (33150)", "Libourne (33500)", 
+                            "Lormont (33310)", "Le Bouscat (33110)", "Eysines (33320)", "Floirac (33270)", "Cestas (33610)", "Blanquefort (33290)", 
+                            "Bruges (33520)", "Ambarès-et-Lagrave (33440)", "La Teste-de-Buch (33260)", "Gujan-Mestras (33470)", 
+                            "Arcachon (33120)", "Andernos-les-Bains (33510)", "Le Haillan (33185)", "Parempuyre (33290)", 
+                            "Martignas-sur-Jalle (33127)", "Taillan-Médoc (33320)", "Saint-Loubès (33450)", "Artigues-près-Bordeaux (33370)", 
+                            "Carbon-Blanc (33560)", "Sainte-Eulalie (33560)", "Saint-Jean-d'Illac (33127)", "Le Pian-Médoc (33290)"
+                          ];
+
+                          const citiesToShow = selectedZone ? allCities.filter(c => zoneCities[selectedZone]?.includes(c)) : allCities;
+
+                          return citiesToShow.map((city) => (
+                            <a
+                              key={city}
+                              href="/"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                setCurrentPage('accueil');
+                                window.scrollTo({ top: 0, behavior: 'smooth' });
+                              }}
+                              className="hover:text-emerald-400 hover:underline transition-all block py-0.5 truncate text-slate-300"
+                              title={`Service de débarras et déménagement à ${city}`}
+                            >
+                              Débarras {city}
+                            </a>
+                          ));
+                        })()}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -1892,34 +2011,50 @@ Référence de suivi : ${newQuote.id}
               </p>
             </div>
 
-            {/* Box 2: Prestations quick navigations (Saves 2 cols) */}
+            {/* Box 2: Simulateurs & Liens (Saves 2 cols) */}
             <div className="space-y-4 lg:col-span-2">
-              <h4 className="text-slate-200 text-xs font-black uppercase tracking-wider font-display">Prestations</h4>
-              <ul className="space-y-2.5 text-xs text-slate-500 font-semibold">
+              <h4 className="text-slate-200 text-xs font-black uppercase tracking-wider font-display">Simulateurs & Conseils</h4>
+              <ul className="space-y-1 text-xs text-slate-500 font-semibold">
                 <li>
                   <button 
-                    onClick={() => { setCurrentPage('enlevements'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
+                    onClick={() => {
+                      setCurrentPage('enlevements');
+                      setTimeout(() => {
+                        const el = document.getElementById('simulateur-enlevement');
+                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }, 100);
+                    }} 
                     className="hover:text-emerald-500 transition cursor-pointer text-left flex items-center gap-1.5"
                   >
-                    <span>📦</span> Enlèvement Encombrants
+                    <span>📊</span> Simulateur Encombrants
                   </button>
                 </li>
                 <li>
-                  <span className="text-slate-600 select-none flex items-center gap-1.5 cursor-not-allowed opacity-50">
-                    <span>🧼</span> Nettoyage Logement <span className="text-[8px] bg-slate-900 text-slate-500 px-1 py-0.5 rounded uppercase font-black font-sans leading-none">bientôt</span>
-                  </span>
-                </li>
-                <li>
-                  <span className="text-slate-600 select-none flex items-center gap-1.5 cursor-not-allowed opacity-50">
-                    <span>🧹</span> Entretien Parties Communes <span className="text-[8px] bg-slate-900 text-slate-500 px-1 py-0.5 rounded uppercase font-black font-sans leading-none">bientôt</span>
-                  </span>
+                  <button 
+                    onClick={() => {
+                      setCurrentPage('demenagement');
+                      setTimeout(() => {
+                        const el = document.getElementById('simulateur-demenagement');
+                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }, 100);
+                    }} 
+                    className="hover:text-emerald-500 transition cursor-pointer text-left flex items-center gap-1.5"
+                  >
+                    <span>📊</span> Simulateur Déménagement
+                  </button>
                 </li>
                 <li>
                   <button 
-                    onClick={() => { setCurrentPage('demenagement'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} 
+                    onClick={() => {
+                      setCurrentPage('accueil');
+                      setTimeout(() => {
+                        const el = document.getElementById('conseils-debarras');
+                        el?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }, 100);
+                    }} 
                     className="hover:text-emerald-500 transition cursor-pointer text-left flex items-center gap-1.5"
                   >
-                    <span>🚚</span> Service de Déménagement
+                    <span>💡</span> Conseils de Tri & Guides
                   </button>
                 </li>
               </ul>
@@ -1997,36 +2132,51 @@ Référence de suivi : ${newQuote.id}
               </ul>
             </div>
 
-            {/* Box 4: Direct contact call cards (Saves 3 cols) */}
+            {/* Box 4: Direct contact & Social Networks (Saves 3 cols) */}
             <div className="space-y-4 lg:col-span-3">
-              <h4 className="text-slate-200 text-xs font-black uppercase tracking-wider font-display">Contact Direct</h4>
-              <div className="space-y-2.5 text-xs font-semibold">
-                <div>
-                  <a href="tel:0661292059" className="text-slate-100 hover:text-emerald-400 transition flex items-center gap-1.5">
-                    <Phone className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
-                    <span>06 61 29 20 59</span>
-                  </a>
-                </div>
-                <div>
+              <h4 className="text-slate-200 text-xs font-black uppercase tracking-wider font-display">Me Suivre & Contacter</h4>
+              
+              <div className="space-y-4 pt-1">
+                {/* Social Logos Side by Side */}
+                <div className="flex items-center gap-3">
+                  {/* WhatsApp Direct Link Icon Only */}
                   <a
                     href="https://wa.me/33661292059?text=Bonjour%20Damien%20Pommier%2C%20je%20souhaiterais%20obtenir%20des%20informations%20concernant%20un%20projet%20de%20d%C3%A9barras%20ou%20d%C3%A9m%C3%A9nagement."
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-slate-100 hover:text-emerald-400 transition flex items-center gap-1.5"
+                    className="p-3 bg-[#25D366]/10 hover:bg-[#25D366]/20 border border-[#25D366]/20 text-[#25D366] rounded-xl transition flex items-center justify-center cursor-pointer"
+                    title="Contacter sur WhatsApp"
                   >
                     <svg
-                      className="w-3.5 h-3.5 fill-[#25D366] shrink-0"
+                      className="w-5 h-5 fill-current shrink-0"
                       viewBox="0 0 24 24"
                       xmlns="http://www.w3.org/2000/svg"
                     >
                       <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.068 2.877 1.216 3.076.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.746.953 3.71 1.458 5.704 1.459h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z" />
                     </svg>
-                    <span>06 61 29 20 59</span>
+                  </a>
+
+                  {/* LinkedIn Direct Link Icon Only */}
+                  <a
+                    href="https://www.linkedin.com/in/damien-pommier/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="p-3 bg-[#0A66C2]/10 hover:bg-[#0A66C2]/20 border border-[#0A66C2]/20 text-[#0A66C2] rounded-xl transition flex items-center justify-center cursor-pointer"
+                    title="Profil LinkedIn"
+                  >
+                    <Linkedin className="w-5 h-5 shrink-0" />
                   </a>
                 </div>
-                <div className="pt-1">
-                  <a href="mailto:damien.societe@outlook.com" className="text-slate-100 hover:text-emerald-400 transition break-all font-mono text-[11px] block">
-                    damien.societe@outlook.com
+
+                {/* Email and Phone references */}
+                <div className="pt-2 border-t border-slate-900/60 space-y-2">
+                  <a href="tel:0661292059" className="text-slate-300 hover:text-emerald-400 transition flex items-center gap-2 text-[11px] font-semibold">
+                    <Phone className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span>06 61 29 20 59</span>
+                  </a>
+                  <a href="mailto:damien.societe@outlook.com" className="text-slate-300 hover:text-emerald-400 transition flex items-center gap-2 text-[11px] font-semibold break-all font-mono">
+                    <Mail className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                    <span>damien.societe@outlook.com</span>
                   </a>
                 </div>
               </div>

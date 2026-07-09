@@ -1,10 +1,46 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @import "tailwindcss";
 
+@variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Dynamic Background and Theme Colors */
+  --bg-app: #f8fafc;
+  --bg-card: #ffffff;
+  --bg-section: #f1f5f9;
+  --bg-input: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --border-color: #cbd5e1;
+  --accent-color: #de456c;
+}
+
+.dark {
+  /* Specific CSS variables for dark background and text colors */
+  --bg-app: #0d1527;
+  --bg-card: #16223f;
+  --bg-section: #111b33;
+  --bg-input: #0f172a;
+  --text-primary: #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --border-color: #24355a;
+  --accent-color: #f39eb0;
+}
+
 @theme {
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
   --font-display: "Space Grotesk", sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Dynamically map CSS variables to Tailwind classes */
+  --color-bg-app: var(--bg-app);
+  --color-bg-card: var(--bg-card);
+  --color-bg-section: var(--bg-section);
+  --color-bg-input: var(--bg-input);
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-border-custom: var(--border-color);
+  --color-accent-custom: var(--accent-color);
 
   --color-emerald-50: #fdf2f4;
   --color-emerald-100: #fbdbe2;
@@ -63,9 +99,9 @@ html {
   margin: 0;
   padding: 0;
   width: 100%;
+  height: 100%;
   max-width: 100vw;
-  overflow-x: hidden;
-  overflow-y: auto;
+  overflow: hidden;
   scroll-behavior: smooth;
 }
 
@@ -73,13 +109,19 @@ body {
   margin: 0;
   padding: 0;
   width: 100%;
+  height: 100%;
   max-width: 100vw;
-  overflow: visible;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background-color: #f8fafc; /* default background to match theme and prevent white bands */
+  -webkit-overflow-scrolling: touch;
 }
 
 #main-app-container {
   width: 100%;
-  min-height: 100vh;
+  min-height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes marquee-ltr {
@@ -159,6 +201,194 @@ body {
     color: #000000 !important;
     page-break-after: avoid;
   }
+}
+
+/* Custom Dark Mode CSS overrides using specific variables */
+.dark body {
+  background-color: var(--bg-app) !important;
+  color: var(--text-primary) !important;
+}
+
+.dark #main-app-container {
+  background: radial-gradient(circle at top left, var(--bg-section) 0%, var(--bg-app) 100%) !important;
+}
+
+/* Override navigation bar in dark mode */
+.dark nav {
+  background-color: rgba(13, 21, 39, 0.85) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Modals & Drawers in dark mode */
+.dark [role="dialog"],
+.dark .fixed .bg-white,
+.dark .bg-white\/90,
+.dark .bg-white\/95,
+.dark .bg-white\/98 {
+  background-color: var(--bg-input) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Target cards, grids, lists and sections with standard background classes */
+.dark .bg-white,
+.dark .bg-white\/50,
+.dark .bg-white\/60,
+.dark .bg-white\/80 {
+  background-color: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+}
+
+/* Specific slate background overrides for cohesive dark mode */
+.dark .bg-slate-50 {
+  background-color: var(--bg-section) !important;
+  border-color: var(--border-color) !important;
+}
+
+.dark .bg-slate-100 {
+  background-color: #1a2a4a !important; /* intermediate dark blue-slate background */
+  border-color: #24355a !important;
+}
+
+.dark .bg-slate-200 {
+  background-color: #24355a !important; /* more intense slate element wrapper */
+  border-color: #2e436f !important;
+}
+
+.dark .bg-slate-300 {
+  background-color: #2e436f !important;
+}
+
+/* Light colorful alert or banner backgrounds in dark mode */
+.dark .bg-emerald-50 {
+  background-color: rgba(6, 78, 59, 0.25) !important;
+  border-color: rgba(16, 185, 129, 0.3) !important;
+  color: #a7f3d0 !important;
+}
+
+.dark .bg-teal-50 {
+  background-color: rgba(13, 148, 136, 0.25) !important;
+  border-color: rgba(20, 184, 166, 0.3) !important;
+  color: #99f6e4 !important;
+}
+
+.dark .bg-rose-50 {
+  background-color: rgba(159, 18, 57, 0.25) !important;
+  border-color: rgba(244, 63, 94, 0.3) !important;
+  color: #fecdd3 !important;
+}
+
+.dark .bg-amber-50 {
+  background-color: rgba(120, 53, 4, 0.25) !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+  color: #fde68a !important;
+}
+
+.dark .bg-red-50 {
+  background-color: rgba(153, 27, 27, 0.25) !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  color: #fca5a5 !important;
+}
+
+/* General border class overrides in dark mode */
+.dark .border,
+.dark .border-t,
+.dark .border-b,
+.dark .border-l,
+.dark .border-r {
+  border-color: var(--border-color) !important;
+}
+
+.dark .border-slate-100,
+.dark .border-slate-150,
+.dark .border-slate-200,
+.dark .border-slate-250,
+.dark .border-slate-300 {
+  border-color: var(--border-color) !important;
+}
+
+/* Text color overrides on cards and pages */
+.dark .text-slate-950,
+.dark .text-slate-900,
+.dark .text-slate-855,
+.dark .text-slate-860,
+.dark .text-slate-850,
+.dark .text-slate-800 {
+  color: var(--text-primary) !important;
+}
+
+.dark .text-slate-755,
+.dark .text-slate-750,
+.dark .text-slate-705,
+.dark .text-slate-700,
+.dark .text-slate-650,
+.dark .text-slate-600,
+.dark .text-slate-550 {
+  color: var(--text-secondary) !important;
+}
+
+.dark .text-slate-500,
+.dark .text-slate-450,
+.dark .text-slate-400,
+.dark .text-slate-350,
+.dark .text-slate-300,
+.dark .text-slate-250 {
+  color: #94a3b8 !important;
+}
+
+/* Hover effects in dark mode */
+.dark .hover\:bg-slate-50:hover,
+.dark .hover\:bg-slate-100:hover,
+.dark .group:hover .group-hover\:text-slate-900 {
+  background-color: #1a2a4a !important;
+  color: #f8fafc !important;
+}
+
+/* Inputs and interactive controls in dark mode */
+.dark input,
+.dark textarea,
+.dark select {
+  background-color: var(--bg-input) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-color) !important;
+}
+
+.dark input:focus,
+.dark textarea:focus,
+.dark select:focus {
+  border-color: var(--accent-custom) !important;
+}
+
+/* Mobile UX & Accessibility Enhancements */
+button,
+a.btn,
+.btn,
+select,
+input,
+textarea,
+[role="button"] {
+  touch-action: manipulation;
+}
+
+/* Ensure clickable touch targets are at least 44x44px for great hand accessibility */
+button:not(.inline-indicator),
+a.btn,
+.btn,
+select,
+input[type="button"],
+input[type="submit"],
+[role="button"]:not(.inline-indicator) {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Standard text / mobile fields should be roomy and easy to select on mobile */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+select,
+textarea {
+  min-height: 44px;
 }
 
 
